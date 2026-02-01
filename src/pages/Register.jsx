@@ -17,7 +17,7 @@ function Register() {
     password: "",
     foto: ""
   });
-
+  //Configuracion de entorno
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });

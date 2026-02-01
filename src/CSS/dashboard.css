@@ -20,7 +20,7 @@
    SIDEBAR - PANEL LATERAL IZQUIERDO
    ============================================ */
 .dashboard-sidebar {
-  width: 320px;
+  width: 310px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border-right: 1px solid rgba(0, 255, 180, 0.2);
@@ -141,7 +141,15 @@
   margin-top: 10px;
 }
 
-.btn-save,
+.btn-save {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
 .btn-cancel {
   flex: 1;
   padding: 12px;

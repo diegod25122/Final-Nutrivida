@@ -403,10 +403,10 @@ function Dashboard() {
             />
             <div className="modal-buttons">
               <button className="btn-save" onClick={guardarObjetivoPasos}>
-                ✅ Guardar
+                Guardar
               </button>
               <button className="btn-cancel" onClick={() => setModalPasos(false)}>
-                ❌ Cancelar
+                Cancelar
               </button>
             </div>
           </div>

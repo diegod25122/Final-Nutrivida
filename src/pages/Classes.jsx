@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import { auth, db } from "../firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where
+} from "firebase/firestore";
+
 import "../CSS/Style.css";
 import "../CSS/clases.css";
 
@@ -40,33 +49,49 @@ function Classes() {
     },
   ];
 
-  const registrarClase = () => {
-    const logueado = localStorage.getItem("logueado");
-    if (!logueado) {
+  // ===============================
+  // REGISTRAR CLASE (FIRESTORE)
+  // ===============================
+  const registrarClase = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
       alert("Debes iniciar sesión para registrar una clase");
       window.location.href = "/login";
       return;
     }
 
-    const usuario = localStorage.getItem("nombreUsuario");
-    const key = `clases_${usuario}`;
-    const guardadas = JSON.parse(localStorage.getItem(key)) || [];
+    try {
+      const ref = collection(db, "usuarios", user.uid, "clases");
 
-    if (guardadas.some(c => c.nombre === claseSeleccionada.nombre)) {
-      alert("Ya estás registrado en esta clase");
-      return;
+      // ❌ evitar duplicados
+      const q = query(ref, where("nombre", "==", claseSeleccionada.nombre));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        alert("Ya estás registrado en esta clase");
+        return;
+      }
+
+      // ✅ guardar clase
+      await addDoc(ref, {
+        nombre: claseSeleccionada.nombre,
+        imagen: claseSeleccionada.img,
+        creadoEn: new Date()
+      });
+
+      alert(`Te registraste en ${claseSeleccionada.nombre} 💪🔥`);
+      setClaseSeleccionada(null);
+
+    } catch (error) {
+      alert("Error al registrar clase");
+      console.error(error);
     }
-
-    guardadas.push({
-      nombre: claseSeleccionada.nombre,
-      imagen: claseSeleccionada.img,
-    });
-
-    localStorage.setItem(key, JSON.stringify(guardadas));
-    alert(`Te registraste en ${claseSeleccionada.nombre} 💪`);
-    setClaseSeleccionada(null);
   };
 
+  // ===============================
+  // COMENTARIOS (LOCAL POR AHORA)
+  // ===============================
   const enviarComentario = (e) => {
     e.preventDefault();
     setResultadoComentario("✔ ¡Comentario enviado! Gracias por tu opinión.");

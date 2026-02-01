@@ -1,33 +1,58 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar iconos
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+
 import "../CSS/Style.css";
 import "../CSS/login.css";
 
 function Login() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const datos = JSON.parse(localStorage.getItem("usuarioNV"));
 
-    if (!datos) {
-      alert("No hay usuarios registrados. Por favor, regístrate primero.");
-      return;
-    }
+    try {
+      // 🔐 Login con Firebase Auth
+      const cred = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    if (email === datos.email && password === datos.password) {
+      // 📄 Obtener datos del usuario desde Firestore
+      const ref = doc(db, "usuarios", cred.user.uid);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        alert("Perfil no encontrado");
+        return;
+      }
+
+      const datos = snap.data();
+
+      // 💾 Guardar sesión (solo lo necesario)
       localStorage.setItem("logueado", "true");
+      localStorage.setItem("usuarioNV", JSON.stringify(datos));
       localStorage.setItem("nombreUsuario", datos.nombres);
-      localStorage.setItem("fotoUsuario", datos.foto || "/images/defaultProfile.png");
+      localStorage.setItem(
+        "fotoUsuario",
+        datos.foto || "/images/defaultProfile.png"
+      );
 
-      window.dispatchEvent(new Event("authChange")); 
+      // 🔔 avisar al Navbar
+      window.dispatchEvent(new Event("authChange"));
+
       navigate("/");
-    } else {
-      alert("Email o contraseña incorrectos");
+
+    } catch (error) {
+      alert("Correo o contraseña incorrectos ❌");
     }
   };
 
@@ -39,11 +64,16 @@ function Login() {
           <div className="login-left">
             <h2>Bienvenido de nuevo</h2>
             <p>Ingresa tus credenciales para continuar.</p>
-            <img src="/images/saludable.jpg" className="login-image" alt="Saludable" />
+            <img
+              src="/images/saludable.jpg"
+              className="login-image"
+              alt="Saludable"
+            />
           </div>
 
           <div className="login-right">
             <h3>Inicia Sesión</h3>
+
             <form onSubmit={handleLogin} className="login-form">
               <div className="input-group">
                 <label>Correo Electrónico</label>
@@ -70,7 +100,6 @@ function Login() {
                     type="button"
                     className="toggle-password"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>

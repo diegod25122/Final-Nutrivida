@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 import "../CSS/Style.css";
 
 function Home() {
@@ -18,7 +20,7 @@ function Home() {
   const [fraseIndex, setFraseIndex] = useState(0);
 
   // ======================
-  // SESIÓN
+  // SESIÓN (FIREBASE)
   // ======================
   const [logueado, setLogueado] = useState(false);
 
@@ -30,18 +32,20 @@ function Home() {
   const [resultado, setResultado] = useState("");
 
   useEffect(() => {
-    // Rotar frases
+    // 🔄 Rotar frases
     const intervalo = setInterval(() => {
       setFraseIndex((prev) => (prev + 1) % frases.length);
     }, 5000);
 
-    // Verificar sesión
-    const sesion = localStorage.getItem("logueado");
-    if (sesion === "true") {
-      setLogueado(true);
-    }
+    // 🔥 ESCUCHAR SESIÓN REAL DE FIREBASE
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setLogueado(!!user);
+    });
 
-    return () => clearInterval(intervalo);
+    return () => {
+      clearInterval(intervalo);
+      unsub();
+    };
   }, []);
 
   // ======================

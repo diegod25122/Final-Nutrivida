@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+
 import "../CSS/Style.css";
 import "../CSS/perfil.css";
 
@@ -10,29 +14,52 @@ function Profile() {
   const [clases, setClases] = useState([]);
 
   useEffect(() => {
-    // PROTEGER RUTA
-    if (localStorage.getItem("logueado") !== "true") {
-      navigate("/login");
-      return;
-    }
+    // 🔐 PROTEGER RUTA CON FIREBASE
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
 
-    const user = JSON.parse(localStorage.getItem("usuarioNV"));
-    if (!user) {
-      navigate("/login");
-      return;
-    }
+      // 📄 traer datos desde Firestore
+      const ref = doc(db, "usuarios", user.uid);
+      const snap = await getDoc(ref);
 
-    setDatos(user);
+      if (!snap.exists()) {
+        navigate("/login");
+        return;
+      }
 
-    const key = `clases_${user.usuario}`;
-    const clasesGuardadas = JSON.parse(localStorage.getItem(key)) || [];
-    setClases(clasesGuardadas);
-  }, []);
+      const userData = snap.data();
+      setDatos(userData);
 
-  const cerrarSesion = () => {
+      // 💾 guardar cache (navbar, home, etc.)
+      localStorage.setItem("logueado", "true");
+      localStorage.setItem("usuarioNV", JSON.stringify(userData));
+      localStorage.setItem("nombreUsuario", userData.nombres);
+      localStorage.setItem(
+        "fotoUsuario",
+        userData.foto || "/images/defaultProfile.png"
+      );
+
+      // 📚 clases por EMAIL (ya no por usuario)
+      const key = `clases_${userData.email}`;
+      const guardadas = JSON.parse(localStorage.getItem(key)) || [];
+      setClases(guardadas);
+    });
+
+    return () => unsub();
+  }, [navigate]);
+
+  const cerrarSesion = async () => {
+    await signOut(auth);
+
     localStorage.removeItem("logueado");
+    localStorage.removeItem("usuarioNV");
     localStorage.removeItem("nombreUsuario");
     localStorage.removeItem("fotoUsuario");
+
+    window.dispatchEvent(new Event("authChange"));
     navigate("/login");
   };
 
@@ -82,14 +109,15 @@ function Profile() {
               />
 
               <h2>{datos.nombres} {datos.apellidos}</h2>
-              <p className="perfil-user">@{datos.usuario}</p>
+              <p className="perfil-user">{datos.email}</p>
 
               <hr />
 
               <div className="profile-info">
                 <p><strong>Nombres:</strong> {datos.nombres}</p>
                 <p><strong>Apellidos:</strong> {datos.apellidos}</p>
-                <p><strong>Usuario:</strong> {datos.usuario}</p>
+                <p><strong>Email:</strong> {datos.email}</p>
+                <p><strong>Objetivo:</strong> {datos.objetivo}</p>
               </div>
 
               <button className="btn-logout" onClick={cerrarSesion}>

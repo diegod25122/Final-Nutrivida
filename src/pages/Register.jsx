@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar iconos
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+
 import "../CSS/register.css";
 
 export default function Register() {
@@ -36,18 +40,45 @@ export default function Register() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password.length < 6) {
       alert("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
-    localStorage.setItem("usuarioNV", JSON.stringify(formData));
-    alert("¡Cuenta creada con éxito! 💪");
-    navigate("/login");
+    try {
+      // 1️⃣ Crear usuario en Firebase Auth
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      // 2️⃣ Guardar datos del perfil en Firestore
+      await setDoc(doc(db, "usuarios", cred.user.uid), {
+        uid: cred.user.uid,
+        nombres: formData.nombres,
+        apellidos: formData.apellidos,
+        email: formData.email,
+        edad: formData.edad,
+        peso: formData.peso,
+        estatura: formData.estatura,
+        sexo: formData.sexo,
+        objetivo: formData.objetivo,
+        foto: formData.foto,
+        creadoEn: new Date()
+      });
+
+      alert("¡Cuenta creada con éxito! 💪🔥");
+      navigate("/login");
+
+    } catch (error) {
+      alert("Error al registrar: " + error.message);
+    }
   };
+
 
   return (
     <div className="new-register-view">
@@ -68,24 +99,24 @@ export default function Register() {
           <div className="input-row">
             <div className="input-item">
               <label>Nombres</label>
-              <input 
-                type="text" 
-                name="nombres" 
-                placeholder="Ej. Juan" 
+              <input
+                type="text"
+                name="nombres"
+                placeholder="Ej. Juan"
                 value={formData.nombres}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="input-item">
               <label>Apellidos</label>
-              <input 
-                type="text" 
-                name="apellidos" 
-                placeholder="Ej. Pérez García" 
+              <input
+                type="text"
+                name="apellidos"
+                placeholder="Ej. Pérez García"
                 value={formData.apellidos}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
           </div>
@@ -98,41 +129,41 @@ export default function Register() {
           <div className="input-row triplet">
             <div className="input-item">
               <label>Edad</label>
-              <input 
-                type="number" 
-                name="edad" 
-                placeholder="Años" 
+              <input
+                type="number"
+                name="edad"
+                placeholder="Años"
                 min="1"
                 max="120"
                 value={formData.edad}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="input-item">
               <label>Peso (kg)</label>
-              <input 
-                type="number" 
-                name="peso" 
-                placeholder="0.0" 
+              <input
+                type="number"
+                name="peso"
+                placeholder="0.0"
                 step="0.1"
                 min="1"
                 value={formData.peso}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
             <div className="input-item">
               <label>Estatura (cm)</label>
-              <input 
-                type="number" 
-                name="estatura" 
-                placeholder="cm" 
+              <input
+                type="number"
+                name="estatura"
+                placeholder="cm"
                 min="50"
                 max="250"
                 value={formData.estatura}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
             </div>
           </div>
@@ -158,27 +189,27 @@ export default function Register() {
 
           <div className="input-item full-row">
             <label>Correo Electrónico</label>
-            <input 
-              type="email" 
-              name="email" 
-              placeholder="correo@ejemplo.com" 
+            <input
+              type="email"
+              name="email"
+              placeholder="correo@ejemplo.com"
               value={formData.email}
-              onChange={handleChange} 
-              required 
+              onChange={handleChange}
+              required
             />
           </div>
 
           <div className="input-item full-row">
             <label>Contraseña</label>
             <div className="password-input-wrapper">
-              <input 
+              <input
                 type={showPassword ? "text" : "password"}
-                name="password" 
-                placeholder="Mínimo 6 caracteres" 
+                name="password"
+                placeholder="Mínimo 6 caracteres"
                 minLength="6"
                 value={formData.password}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                required
               />
               <button
                 type="button"

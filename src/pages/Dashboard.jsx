@@ -6,7 +6,7 @@ import "../CSS/dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-  
+
   const [usuario, setUsuario] = useState(null);
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [formEdit, setFormEdit] = useState({});
@@ -87,7 +87,7 @@ function Dashboard() {
 
   const calcularCaloriasRecomendadas = (datos) => {
     const { peso, estatura, edad, sexo, objetivo } = datos;
-    
+
     if (!peso || !estatura || !edad || !sexo) return;
 
     const alturaM = estatura / 100;
@@ -99,7 +99,7 @@ function Dashboard() {
     }
 
     let caloriasObjetivo = tmb * 1.55;
-    
+
     if (objetivo === "Perder Peso") {
       caloriasObjetivo -= 500;
     } else if (objetivo === "Ganar Músculo") {
@@ -127,6 +127,18 @@ function Dashboard() {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormEdit({ ...formEdit, foto: reader.result }); // Guarda la imagen en base64
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   const salirDeClase = (nombreClase, dia, hora) => {
     const confirmar = window.confirm(`¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`);
     if (!confirmar) return;
@@ -136,7 +148,7 @@ function Dashboard() {
     const clasesActualizadas = clasesInscritas.filter(
       c => !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
     );
-    
+
     localStorage.setItem(clasesKey, JSON.stringify(clasesActualizadas));
     setClasesInscritas(clasesActualizadas);
     alert(`Te has dado de baja de ${nombreClase}`);
@@ -149,25 +161,29 @@ function Dashboard() {
 
   const guardarCambiosPerfil = async () => {
     const userId = localStorage.getItem("userId");
-    
+
     try {
-      // Actualizar en Firestore
       const docRef = doc(db, "usuarios", userId);
-      await updateDoc(docRef, {
+
+      const nuevosDatos = {
+        nombres: formEdit.nombres,
+        apellidos: formEdit.apellidos,
+        email: formEdit.email,
         edad: parseInt(formEdit.edad),
         peso: parseFloat(formEdit.peso),
         estatura: parseInt(formEdit.estatura),
-        objetivo: formEdit.objetivo
-      });
+        objetivo: formEdit.objetivo,
+        foto: formEdit.foto
+      };
 
-      // Actualizar estado local
+      await updateDoc(docRef, nuevosDatos);
+
+      // Actualizar estados y storage
       setUsuario(formEdit);
       setEditandoPerfil(false);
       calcularCaloriasRecomendadas(formEdit);
-      
-      // Actualizar localStorage
       localStorage.setItem("usuarioData", JSON.stringify(formEdit));
-      
+
       alert("✅ Perfil actualizado correctamente");
     } catch (error) {
       console.error("Error al actualizar:", error);
@@ -185,18 +201,18 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      
+
       <aside className="dashboard-sidebar">
         <div className="profile-section">
           <div className="profile-photo">
-            <img 
-              src={usuario.foto || "/images/perfil.jpg"} 
-              alt="Perfil" 
+            <img
+              src={usuario.foto || "/images/perfil.jpg"}
+              alt="Perfil"
             />
           </div>
-          
+
           <h2>{usuario.nombres} {usuario.apellidos}</h2>
-          
+
           {!editandoPerfil ? (
             <>
               <div className="user-info">
@@ -207,8 +223,8 @@ function Dashboard() {
                 <p><strong>Sexo:</strong> {usuario.sexo}</p>
                 <p><strong>Objetivo:</strong> {usuario.objetivo}</p>
               </div>
-              
-              <button 
+
+              <button
                 className="btn-edit-profile"
                 onClick={() => setEditandoPerfil(true)}
               >
@@ -217,45 +233,59 @@ function Dashboard() {
             </>
           ) : (
             <div className="edit-form">
+              <label>Nombres</label>
               <input
-                type="number"
-                name="edad"
-                placeholder="Edad"
-                value={formEdit.edad}
+                type="text"
+                name="nombres"
+                value={formEdit.nombres}
                 onChange={handleEditChange}
               />
+
+              <label>Apellidos</label>
               <input
-                type="number"
-                name="peso"
-                placeholder="Peso (kg)"
-                step="0.1"
-                value={formEdit.peso}
+                type="text"
+                name="apellidos"
+                value={formEdit.apellidos}
                 onChange={handleEditChange}
               />
+
+              <label>Correo Electrónico</label>
               <input
-                type="number"
-                name="estatura"
-                placeholder="Estatura (cm)"
-                value={formEdit.estatura}
+                type="email"
+                name="email"
+                value={formEdit.email}
                 onChange={handleEditChange}
               />
-              <select
-                name="objetivo"
-                value={formEdit.objetivo}
-                onChange={handleEditChange}
-              >
+
+              <label>Foto de Perfil</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file-input"
+              />
+
+              <div className="input-row-edit">
+                <div>
+                  <label>Edad</label>
+                  <input type="number" name="edad" value={formEdit.edad} onChange={handleEditChange} />
+                </div>
+                <div>
+                  <label>Peso (kg)</label>
+                  <input type="number" step="0.1" name="peso" value={formEdit.peso} onChange={handleEditChange} />
+                </div>
+              </div>
+
+              <label>Objetivo</label>
+              <select name="objetivo" value={formEdit.objetivo} onChange={handleEditChange}>
                 <option value="Salud">Salud</option>
                 <option value="Perder Peso">Perder Peso</option>
                 <option value="Ganar Músculo">Ganar Músculo</option>
               </select>
-              
+
               <div className="edit-buttons">
-                <button className="btn-save" onClick={guardarCambiosPerfil}>
-                  ✅ Guardar
-                </button>
-                <button className="btn-cancel" onClick={() => setEditandoPerfil(false)}>
-                  ❌ Cancelar
-                </button>
+                <button className="btn-save" onClick={guardarCambiosPerfil}>✅ Guardar</button>
+                <button className="btn-cancel" onClick={() => setEditandoPerfil(false)}>❌ Cancelar</button>
               </div>
             </div>
           )}
@@ -263,13 +293,13 @@ function Dashboard() {
       </aside>
 
       <main className="dashboard-main">
-        
+
         <section className="metrics-section">
           <h1>Análisis de Rendimiento y Hábitos de Gimnasio</h1>
-          
+
           <div className="metrics-grid">
-            
-            <div 
+
+            <div
               className="metric-card clickable"
               onClick={() => setModalPasos(true)}
             >
@@ -281,7 +311,7 @@ function Dashboard() {
               <p className="metric-label">pasos diarios</p>
             </div>
 
-            <div 
+            <div
               className="metric-card clickable"
               onClick={() => setModalCronometro(true)}
             >
@@ -300,7 +330,7 @@ function Dashboard() {
                 {objetivoCalorias || "Calculando..."}
               </div>
               <p className="metric-label">kcal recomendadas</p>
-              <button 
+              <button
                 className="btn-ver-recetas"
                 onClick={() => navigate("/recetas")}
               >
@@ -313,7 +343,7 @@ function Dashboard() {
 
         <section className="classes-table-section">
           <h2>Mis Clases Inscritas</h2>
-          
+
           {clasesInscritas.length === 0 ? (
             <div className="no-classes">
               <p>📋 No estás inscrito en ninguna clase todavía</p>
@@ -345,7 +375,7 @@ function Dashboard() {
                     <td>{clase.hora}</td>
                     <td>👤 {clase.instructor}</td>
                     <td>
-                      <button 
+                      <button
                         className="btn-exit-class"
                         onClick={() => salirDeClase(clase.nombre, clase.dia, clase.hora)}
                       >

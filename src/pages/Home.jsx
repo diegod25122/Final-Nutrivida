@@ -165,13 +165,9 @@ function Home() {
         ) : (
           <>
             <h3>ÚNETE A NUTRI•VIDA HOY</h3>
-            <button
-              onClick={() => window.open('/register', '_blank')}
-              className="btn-join"
-              style={{ cursor: 'pointer', border: 'none' }}
-            >
+            <Link to="/register" className="btn-join">
               Registrarme
-            </button>
+            </Link>
           </>
         )}
       </section>

@@ -5,13 +5,11 @@ import "../CSS/login.css";
 
 function Login() {
   const navigate = useNavigate();
-
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
-
     const datos = JSON.parse(localStorage.getItem("usuarioNV"));
 
     if (!datos) {
@@ -19,72 +17,55 @@ function Login() {
       return;
     }
 
-    if (usuario === datos.usuario && password === datos.password) {
+    // OJO: En tu Register guardamos 'nombre', pero aquí buscas 'usuario'
+    // Asegúrate de que los nombres de los campos coincidan
+    if (usuario === datos.nombre && password === datos.password) {
       localStorage.setItem("logueado", "true");
-      localStorage.setItem("nombreUsuario", datos.usuario);
-      localStorage.setItem("fotoUsuario", datos.foto || "/images/defaultProfile.png");
+      localStorage.setItem("nombreUsuario", datos.nombre);
+      localStorage.setItem("fotoUsuario", datos.fotoPerfil || "/images/defaultProfile.png");
 
-      window.dispatchEvent(new Event("authChange")); // 🔥 CLAVE
-
+      window.dispatchEvent(new Event("authChange")); 
       navigate("/");
-    }
-    else {
+    } else {
       alert("Usuario o contraseña incorrectos");
     }
   };
 
   return (
     <div className="login-body">
-      {/* NAVBAR */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div className="container">
-          <Link className="navbar-brand fw-bold" to="/">
-            NUTRI<span className="text-success">•VIDA</span>
-          </Link>
-
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Inicio</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">Sobre Nosotros</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/classes">Clases</Link>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      {/* LOGIN */}
+      {/* 💡 HE QUITADO LA NAVBAR DE AQUÍ PORQUE YA ESTÁ EN APP.JSX */}
+      
       <div className="login-wrapper">
         <div className="login-container">
 
           <div className="login-left">
             <h2>Bienvenido de nuevo</h2>
             <p>Ingresa tus credenciales para continuar.</p>
-            <img src="/images/saludable.jpg" className="login-image" />
+            <img src="/images/saludable.jpg" className="login-image" alt="Saludable" />
           </div>
 
           <div className="login-right">
             <h3>Inicia Sesión</h3>
-
             <form onSubmit={handleLogin} className="login-form">
-              <label>Usuario</label>
-              <input
-                type="text"
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-                required
-              />
+              <div className="input-group">
+                <label>Usuario / Email</label>
+                <input
+                  type="text"
+                  value={usuario}
+                  onChange={(e) => setUsuario(e.target.value)}
+                  required
+                />
+              </div>
 
-              <label>Contraseña</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="input-group">
+                <label>Contraseña</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
 
               <button type="submit" className="btn-login">
                 Ingresar
@@ -92,7 +73,7 @@ function Login() {
             </form>
 
             <p className="login-text">
-              ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+              ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
             </p>
           </div>
 

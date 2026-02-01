@@ -110,13 +110,12 @@
    SECCIÓN COMENTARIOS
 ========================= */
 .comments-section {
-  background: linear-gradient(135deg, #f0f4c3, #e6ee9c);
   padding: 10px 20px;
   text-align: center;
 }
 
 .comments-section h2 {
-  color: #0254a0;
+  color: #f4f4f4;
   margin-bottom: 20px;
   font-size: 2em;
 }
@@ -161,7 +160,7 @@
 }
 
 .comment-form button:hover {
-  background-color: #5e35b1;
+  background-color: #4cb68d;
 }
 
 .comment-result {

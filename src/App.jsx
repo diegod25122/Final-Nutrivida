@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -9,10 +9,17 @@ import Access from "./pages/Access";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Admin from "./pages/admin";
+
 function App() {
+  const location = useLocation();
+
+  const ocultarLayout = location.pathname === "/admin";
+
   return (
     <>
-      <Navbar />
+      {/*  NO Navbar en /admin */}
+      {!ocultarLayout && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -22,9 +29,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
 
-      <Footer />
+      {/*  NO Footer en /admin */}
+      {!ocultarLayout && <Footer />}
     </>
   );
 }

@@ -15,45 +15,67 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-    try {
-      // 🔐 Login con Firebase Auth
-      const cred = await signInWithEmailAndPassword(auth, email, password);
+  //  ADMIN QUEMADO
+  
+  if (email === "admin@nutrivida.com" && password === "nutrivid@2026") {
+    localStorage.setItem("logueado", "true");
+    localStorage.setItem("rol", "admin");
 
-      // 📄 Obtener datos del usuario desde Firestore
-      const ref = doc(db, "usuarios", cred.user.uid);
-      const snap = await getDoc(ref);
+    // limpiar posibles datos viejos
+    localStorage.removeItem("usuarioNV");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("nombreUsuario");
+    localStorage.removeItem("fotoUsuario");
 
-      if (!snap.exists()) {
-        alert("Perfil no encontrado");
-        return;
-      }
+    window.dispatchEvent(new Event("authChange"));
+    navigate("/admin");
+    return;
+  }
 
-      const datos = snap.data();
+  // =========================
+  // 👤 USUARIO NORMAL (Firebase)
+  // =========================
+  try {
+    // 🔐 Login con Firebase Auth
+    const cred = await signInWithEmailAndPassword(auth, email, password);
 
-      // 💾 Guardar sesión (CLAVES CONSISTENTES)
-      localStorage.setItem("logueado", "true");
-      localStorage.setItem("usuarioNV", JSON.stringify(datos));
-      localStorage.setItem("userId", cred.user.uid);
-      localStorage.setItem("nombreUsuario", datos.nombres || "");
-      localStorage.setItem(
-        "fotoUsuario",
-        datos.foto || "/images/defaultProfile.png"
-      );
+    // 📄 Obtener datos del usuario desde Firestore
+    const ref = doc(db, "usuarios", cred.user.uid);
+    const snap = await getDoc(ref);
 
-      // 🔔 avisar al Navbar
-      window.dispatchEvent(new Event("authChange"));
-
-      // 👉 ir al dashboard
-      navigate("/dashboard");
-
-    } catch (error) {
-      console.error(error);
-      alert("Correo o contraseña incorrectos ❌");
+    if (!snap.exists()) {
+      alert("Perfil no encontrado");
+      return;
     }
-  };
+
+    const datos = snap.data();
+
+    // 💾 Guardar sesión (como ya lo tenías)
+    localStorage.setItem("logueado", "true");
+    localStorage.setItem("rol", "user");
+    localStorage.setItem("usuarioNV", JSON.stringify(datos));
+    localStorage.setItem("userId", cred.user.uid);
+    localStorage.setItem("nombreUsuario", datos.nombres || "");
+    localStorage.setItem(
+      "fotoUsuario",
+      datos.foto || "/images/defaultProfile.png"
+    );
+
+    // 🔔 avisar al Navbar
+    window.dispatchEvent(new Event("authChange"));
+
+    // 👉 ir al dashboard normal
+    navigate("/dashboard");
+
+  } catch (error) {
+    console.error(error);
+    alert("Correo o contraseña incorrectos ❌");
+  }
+};
+
 
   return (
     <div className="login-body">

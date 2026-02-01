@@ -165,26 +165,35 @@ function Dashboard() {
     try {
       const docRef = doc(db, "usuarios", userId);
 
+      // 1. Preparamos el objeto con los nombres de campos exactos de tu base de datos
       const nuevosDatos = {
         nombres: formEdit.nombres,
         apellidos: formEdit.apellidos,
         email: formEdit.email,
-        edad: parseInt(formEdit.edad),
-        peso: parseFloat(formEdit.peso),
-        estatura: parseInt(formEdit.estatura),
+        edad: Number(formEdit.edad),
+        peso: Number(formEdit.peso),
+        estatura: Number(formEdit.estatura),
         objetivo: formEdit.objetivo,
-        foto: formEdit.foto
+        foto: formEdit.foto || null
       };
 
+      // 2. Actualizamos Firebase (Esto es lo que ve tu compañero)
       await updateDoc(docRef, nuevosDatos);
 
-      // Actualizar estados y storage
-      setUsuario(formEdit);
-      setEditandoPerfil(false);
-      calcularCaloriasRecomendadas(formEdit);
-      localStorage.setItem("usuarioData", JSON.stringify(formEdit));
+      // 3. Actualizamos React y LocalStorage (Esto es lo que ves tú)
+      // Usamos 'nuevosDatos' para asegurar que el storage tenga el email actualizado
+      const perfilCompleto = { ...usuario, ...nuevosDatos };
 
-      alert("✅ Perfil actualizado correctamente");
+      setUsuario(perfilCompleto);
+      setEditandoPerfil(false);
+
+      // Recalculamos con los datos frescos
+      calcularCaloriasRecomendadas(perfilCompleto);
+
+      // Sobrescribimos el local storage con la info nueva
+      localStorage.setItem("usuarioData", JSON.stringify(perfilCompleto));
+
+      alert("✅ ¡Perfil actualizado! Los cambios se reflejarán en todo el sistema.");
     } catch (error) {
       console.error("Error al actualizar:", error);
       alert("Error al actualizar el perfil");

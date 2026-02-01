@@ -146,3 +146,51 @@
     .input-row { flex-direction: column; gap: 18px; }
     .register-grid { padding: 30px 25px; }
 }
+/* Agrega esto a tu login.css y register.css */
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 45px; /* Espacio para el botón */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.toggle-password:hover {
+  color: #4CAF50;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.toggle-password:focus {
+  outline: 2px solid #4CAF50;
+  border-radius: 4px;
+  outline-offset: 2px;
+}
+
+/* Animación suave al cambiar de icono */
+.toggle-password svg {
+  transition: opacity 0.2s ease;
+}

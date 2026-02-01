@@ -1,40 +1,38 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar iconos
 import "../CSS/Style.css";
 import "../CSS/login.css";
 
 function Login() {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
     const datos = JSON.parse(localStorage.getItem("usuarioNV"));
 
     if (!datos) {
-      alert("No hay usuarios registrados");
+      alert("No hay usuarios registrados. Por favor, regístrate primero.");
       return;
     }
 
-    // OJO: En tu Register guardamos 'nombre', pero aquí buscas 'usuario'
-    // Asegúrate de que los nombres de los campos coincidan
-    if (usuario === datos.nombre && password === datos.password) {
+    if (email === datos.email && password === datos.password) {
       localStorage.setItem("logueado", "true");
-      localStorage.setItem("nombreUsuario", datos.nombre);
-      localStorage.setItem("fotoUsuario", datos.fotoPerfil || "/images/defaultProfile.png");
+      localStorage.setItem("nombreUsuario", datos.nombres);
+      localStorage.setItem("fotoUsuario", datos.foto || "/images/defaultProfile.png");
 
       window.dispatchEvent(new Event("authChange")); 
       navigate("/");
     } else {
-      alert("Usuario o contraseña incorrectos");
+      alert("Email o contraseña incorrectos");
     }
   };
 
   return (
     <div className="login-body">
-      {/* 💡 HE QUITADO LA NAVBAR DE AQUÍ PORQUE YA ESTÁ EN APP.JSX */}
-      
       <div className="login-wrapper">
         <div className="login-container">
 
@@ -48,23 +46,35 @@ function Login() {
             <h3>Inicia Sesión</h3>
             <form onSubmit={handleLogin} className="login-form">
               <div className="input-group">
-                <label>Usuario / Email</label>
+                <label>Correo Electrónico</label>
                 <input
-                  type="text"
-                  value={usuario}
-                  onChange={(e) => setUsuario(e.target.value)}
+                  type="email"
+                  placeholder="correo@ejemplo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
 
               <div className="input-group">
                 <label>Contraseña</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Ingresa tu contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
 
               <button type="submit" className="btn-login">

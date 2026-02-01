@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar iconos
 import "../CSS/register.css";
 
 export default function Register() {
@@ -8,7 +9,6 @@ export default function Register() {
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
-    usuario: '',
     email: '',
     password: '',
     edad: '',
@@ -18,6 +18,8 @@ export default function Register() {
     objetivo: 'Salud',
     foto: null
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +38,12 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (formData.password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     localStorage.setItem("usuarioNV", JSON.stringify(formData));
     alert("¡Cuenta creada con éxito! 💪");
     navigate("/login");
@@ -59,27 +67,73 @@ export default function Register() {
 
           <div className="input-row">
             <div className="input-item">
-              <label>Nombre Completo</label>
-              <input type="text" name="nombres" placeholder="Ej. Juan Pérez" onChange={handleChange} required />
+              <label>Nombres</label>
+              <input 
+                type="text" 
+                name="nombres" 
+                placeholder="Ej. Juan" 
+                value={formData.nombres}
+                onChange={handleChange} 
+                required 
+              />
             </div>
             <div className="input-item">
-              <label>Foto de Perfil</label>
-              <input type="file" accept="image/*" onChange={handleFileChange} className="file-input" />
+              <label>Apellidos</label>
+              <input 
+                type="text" 
+                name="apellidos" 
+                placeholder="Ej. Pérez García" 
+                value={formData.apellidos}
+                onChange={handleChange} 
+                required 
+              />
             </div>
+          </div>
+
+          <div className="input-item full-row">
+            <label>Foto de Perfil (Opcional)</label>
+            <input type="file" accept="image/*" onChange={handleFileChange} className="file-input" />
           </div>
 
           <div className="input-row triplet">
             <div className="input-item">
               <label>Edad</label>
-              <input type="number" name="edad" placeholder="Años" onChange={handleChange} required />
+              <input 
+                type="number" 
+                name="edad" 
+                placeholder="Años" 
+                min="1"
+                max="120"
+                value={formData.edad}
+                onChange={handleChange} 
+                required 
+              />
             </div>
             <div className="input-item">
               <label>Peso (kg)</label>
-              <input type="number" name="peso" placeholder="0.0" onChange={handleChange} required />
+              <input 
+                type="number" 
+                name="peso" 
+                placeholder="0.0" 
+                step="0.1"
+                min="1"
+                value={formData.peso}
+                onChange={handleChange} 
+                required 
+              />
             </div>
             <div className="input-item">
               <label>Estatura (cm)</label>
-              <input type="number" name="estatura" placeholder="cm" onChange={handleChange} required />
+              <input 
+                type="number" 
+                name="estatura" 
+                placeholder="cm" 
+                min="50"
+                max="250"
+                value={formData.estatura}
+                onChange={handleChange} 
+                required 
+              />
             </div>
           </div>
 
@@ -104,12 +158,37 @@ export default function Register() {
 
           <div className="input-item full-row">
             <label>Correo Electrónico</label>
-            <input type="email" name="email" placeholder="correo@ejemplo.com" onChange={handleChange} required />
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="correo@ejemplo.com" 
+              value={formData.email}
+              onChange={handleChange} 
+              required 
+            />
           </div>
 
           <div className="input-item full-row">
             <label>Contraseña</label>
-            <input type="password" name="password" placeholder="Mínimo 6 caracteres" onChange={handleChange} required />
+            <div className="password-input-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"}
+                name="password" 
+                placeholder="Mínimo 6 caracteres" 
+                minLength="6"
+                value={formData.password}
+                onChange={handleChange} 
+                required 
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="btn-save">Finalizar Registro</button>

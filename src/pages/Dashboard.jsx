@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-
+import { getDoc } from "firebase/firestore";
 
 import "../CSS/dashboard.css";
 
@@ -27,27 +27,38 @@ function Dashboard() {
   const [clasesInscritas, setClasesInscritas] = useState([]);
 
   useEffect(() => {
-    const logueado = localStorage.getItem("logueado");
-    if (!logueado || logueado !== "true") {
-      alert("Debes iniciar sesión para ver tu dashboard");
-      navigate("/login");
-      return;
-    }
+    const cargarDashboard = async () => {
+      const logueado = localStorage.getItem("logueado");
+      if (!logueado || logueado !== "true") {
+        alert("Debes iniciar sesión para ver tu dashboard");
+        navigate("/login");
+        return;
+      }
 
-    const datosUsuario = JSON.parse(localStorage.getItem("usuarioNV"));
-    if (datosUsuario) {
-      setUsuario(datosUsuario);
-      setFormEdit(datosUsuario);
-      calcularCaloriasRecomendadas(datosUsuario);
-    }
+      const datosUsuario = JSON.parse(localStorage.getItem("usuarioNV"));
+      if (datosUsuario) {
+        setUsuario(datosUsuario);
+        setFormEdit(datosUsuario);
+        calcularCaloriasRecomendadas(datosUsuario);
+      }
 
-    const pasosGuardados = localStorage.getItem("objetivoPasos");
-    if (pasosGuardados) setObjetivoPasos(pasosGuardados);
+      const pasosGuardados = localStorage.getItem("objetivoPasos");
+      if (pasosGuardados) setObjetivoPasos(pasosGuardados);
 
-    const nombreUsuario = localStorage.getItem("nombreUsuario");
-    const clasesKey = `clases_${nombreUsuario}`;
-    const clases = JSON.parse(localStorage.getItem(clasesKey)) || [];
-    setClasesInscritas(clases);
+      // 🔥 PARTE FIREBASE (ASÍ SÍ FUNCIONA)
+      const user = auth.currentUser;
+      if (user) {
+        const ref = doc(db, "usuarios", user.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          setClasesInscritas(data.clases || []);
+        }
+      }
+    };
+
+    cargarDashboard();
   }, [navigate]);
 
   useEffect(() => {
@@ -98,19 +109,30 @@ function Dashboard() {
     const secs = segundos % 60;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const salirDeClase = (nombreClase, dia, hora) => {
-    const confirmar = window.confirm(`¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`);
+  const salirDeClase = async (nombreClase, dia, hora) => {
+    const confirmar = window.confirm(
+      `¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`
+    );
     if (!confirmar) return;
 
     const nombreUsuario = localStorage.getItem("nombreUsuario");
     const clasesKey = `clases_${nombreUsuario}`;
+
     const clasesActualizadas = clasesInscritas.filter(
       c => !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
     );
 
+    const user = auth.currentUser;
+    if (user) {
+      const ref = doc(db, "usuarios", user.uid);
+      await updateDoc(ref, {
+        clases: clasesActualizadas
+      });
+    }
+
     localStorage.setItem(clasesKey, JSON.stringify(clasesActualizadas));
     setClasesInscritas(clasesActualizadas);
+
     alert(`Te has dado de baja de ${nombreClase}`);
   };
 
@@ -119,38 +141,38 @@ function Dashboard() {
     setFormEdit({ ...formEdit, [name]: value });
   };
 
-const guardarCambiosPerfil = async () => {
-  try {
-    const user = auth.currentUser;
-    if (!user) {
-      alert("Sesión no válida");
-      return;
+  const guardarCambiosPerfil = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Sesión no válida");
+        return;
+      }
+
+      // 🔥 ACTUALIZAR EN FIRESTORE
+      const ref = doc(db, "usuarios", user.uid);
+
+      await updateDoc(ref, {
+        edad: formEdit.edad,
+        peso: formEdit.peso,
+        estatura: formEdit.estatura,
+        objetivo: formEdit.objetivo,
+        actualizadoEn: new Date()
+      });
+
+      // 💾 ACTUALIZAR LOCAL (para no romper nada)
+      localStorage.setItem("usuarioNV", JSON.stringify(formEdit));
+      setUsuario(formEdit);
+      setEditandoPerfil(false);
+      calcularCaloriasRecomendadas(formEdit);
+
+      alert(" Perfil actualizado correctamente");
+
+    } catch (error) {
+      console.error(error);
+      alert(" Error al actualizar perfil");
     }
-
-    // 🔥 ACTUALIZAR EN FIRESTORE
-    const ref = doc(db, "usuarios", user.uid);
-
-    await updateDoc(ref, {
-      edad: formEdit.edad,
-      peso: formEdit.peso,
-      estatura: formEdit.estatura,
-      objetivo: formEdit.objetivo,
-      actualizadoEn: new Date()
-    });
-
-    // 💾 ACTUALIZAR LOCAL (para no romper nada)
-    localStorage.setItem("usuarioNV", JSON.stringify(formEdit));
-    setUsuario(formEdit);
-    setEditandoPerfil(false);
-    calcularCaloriasRecomendadas(formEdit);
-
-    alert(" Perfil actualizado correctamente");
-
-  } catch (error) {
-    console.error(error);
-    alert(" Error al actualizar perfil");
-  }
-};
+  };
 
 
   if (!usuario) {
@@ -193,13 +215,13 @@ const guardarCambiosPerfil = async () => {
             <div className="edit-form">
               <label>Edad</label>
               <input type="number" name="edad" value={formEdit.edad} onChange={handleEditChange} />
-              
+
               <label>Peso (kg)</label>
               <input type="number" name="peso" value={formEdit.peso} onChange={handleEditChange} />
-              
+
               <label>Estatura (cm)</label>
               <input type="number" name="estatura" value={formEdit.estatura} onChange={handleEditChange} />
-              
+
               <label>Objetivo</label>
               <select name="objetivo" value={formEdit.objetivo} onChange={handleEditChange}>
                 <option value="Salud">Salud</option>
@@ -221,7 +243,7 @@ const guardarCambiosPerfil = async () => {
         <section className="metrics-section">
           <h1>Análisis de Rendimiento y Hábitos de Gimnasio</h1>
           <div className="user-name-top"> <h2>{usuario.nombres} {usuario.apellidos}</h2> </div>
-          
+
           <div className="metrics-grid">
             <div className="metric-card clickable" onClick={() => setModalPasos(true)}>
               <div className="metric-icon">👟</div>

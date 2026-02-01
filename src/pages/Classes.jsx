@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db } from "../firebase";
+
 import "../CSS/Style.css";
 import "../CSS/clases.css";
 
 function Classes() {
   const navigate = useNavigate();
+
   const [claseSeleccionada, setClaseSeleccionada] = useState(null);
   const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
   const [comentario, setComentario] = useState("");
@@ -64,51 +69,64 @@ function Classes() {
         { dia: "Jueves", hora: "18:00 - 19:00", instructor: "Miguel Ángel" },
         { dia: "Sábado", hora: "11:00 - 12:00", instructor: "Carlos Rivera" }
       ]
-    },
+    }
   ];
 
-  const registrarClase = () => {
-    if (!horarioSeleccionado) {
-      alert("Por favor selecciona un horario");
-      return;
-    }
+const registrarClase = async () => {
+  if (!horarioSeleccionado) {
+    alert("Por favor selecciona un horario");
+    return;
+  }
 
-    const logueado = localStorage.getItem("logueado");
-    if (!logueado) {
-      alert("Debes iniciar sesión para registrar una clase");
-      navigate("/login");
-      return;
-    }
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Debes iniciar sesión");
+    navigate("/login");
+    return;
+  }
 
-    const usuario = localStorage.getItem("nombreUsuario");
-    const key = `clases_${usuario}`;
-    const guardadas = JSON.parse(localStorage.getItem(key)) || [];
-
-    // Verificar si ya está registrado en esta clase con este horario
-    const yaRegistrado = guardadas.some(
-      c => c.nombre === claseSeleccionada.nombre && 
-           c.dia === horarioSeleccionado.dia && 
-           c.hora === horarioSeleccionado.hora
-    );
-
-    if (yaRegistrado) {
-      alert("Ya estás registrado en esta clase con este horario");
-      return;
-    }
-
-    guardadas.push({
-      nombre: claseSeleccionada.nombre,
-      imagen: claseSeleccionada.img,
-      dia: horarioSeleccionado.dia,
-      hora: horarioSeleccionado.hora,
-      instructor: horarioSeleccionado.instructor
-    });
-
-    localStorage.setItem(key, JSON.stringify(guardadas));
-    alert(`✅ Te registraste en ${claseSeleccionada.nombre}\n${horarioSeleccionado.dia} ${horarioSeleccionado.hora}\nInstructor: ${horarioSeleccionado.instructor}`);
-    setClaseSeleccionada(null);
-    setHorarioSeleccionado(null);
+  const nuevaClase = {
+    nombre: claseSeleccionada.nombre,
+    imagen: claseSeleccionada.img,
+    dia: horarioSeleccionado.dia,
+    hora: horarioSeleccionado.hora,
+    instructor: horarioSeleccionado.instructor
   };
+
+  // 🔥 GUARDAR EN FIREBASE
+  const ref = doc(db, "usuarios", user.uid);
+
+  await updateDoc(ref, {
+    clases: arrayUnion(nuevaClase)
+  });
+
+  // 💾 SEGUIR GUARDANDO EN LOCAL (para no romper dashboard)
+  const usuario = localStorage.getItem("nombreUsuario");
+  const key = `clases_${usuario}`;
+  const guardadas = JSON.parse(localStorage.getItem(key)) || [];
+
+  const yaRegistrado = guardadas.some(
+    c =>
+      c.nombre === nuevaClase.nombre &&
+      c.dia === nuevaClase.dia &&
+      c.hora === nuevaClase.hora
+  );
+
+  if (yaRegistrado) {
+    alert("Ya estás registrado en esta clase con este horario");
+    return;
+  }
+
+  guardadas.push(nuevaClase);
+  localStorage.setItem(key, JSON.stringify(guardadas));
+
+  alert(
+    `✅ Te registraste en ${nuevaClase.nombre}\n${nuevaClase.dia} ${nuevaClase.hora}\nInstructor: ${nuevaClase.instructor}`
+  );
+
+  setClaseSeleccionada(null);
+  setHorarioSeleccionado(null);
+};
 
   const enviarComentario = (e) => {
     e.preventDefault();
@@ -164,19 +182,6 @@ function Classes() {
         </table>
       </section>
 
-      {/* AMIGOS */}
-      <section className="friends-section neon-box">
-        <h2 className="neon-title">👥 Conecta con tus amigos</h2>
-        <div className="friends-container">
-          {["@JuanFit", "@LauraHealthy", "@CarlosGym"].map((u) => (
-            <div key={u} className="friend-card">
-              <img src="/images/perfil.jpg" alt={u} />
-              <p>{u}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* COMENTARIOS */}
       <section className="comments-section">
         <h2>Deja tu comentario</h2>
@@ -192,58 +197,50 @@ function Classes() {
         {resultadoComentario && <p className="fade-in">{resultadoComentario}</p>}
       </section>
 
-      {/* MODAL - SELECCIÓN DE HORARIOS */}
+      {/* MODAL */}
       {claseSeleccionada && (
         <div className="modal show d-block">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h5>📅 {claseSeleccionada.nombre} - Elige tu horario</h5>
-                <button 
-                  className="btn-close" 
+                <button
+                  className="btn-close"
                   onClick={() => {
                     setClaseSeleccionada(null);
                     setHorarioSeleccionado(null);
-                  }} 
+                  }}
                 />
               </div>
+
               <div className="modal-body">
-                <img 
-                  src={claseSeleccionada.img} 
-                  className="img-fluid rounded mb-3" 
+                <img
+                  src={claseSeleccionada.img}
+                  className="img-fluid rounded mb-3"
                   alt={claseSeleccionada.nombre}
                 />
-                
-                <h6 className="mb-3">Horarios Disponibles:</h6>
-                
+
                 <div className="horarios-list">
                   {claseSeleccionada.horarios.map((horario, index) => (
-                    <div 
+                    <div
                       key={index}
-                      className={`horario-item ${horarioSeleccionado === horario ? 'selected' : ''}`}
+                      className={`horario-item ${horarioSeleccionado === horario ? "selected" : ""}`}
                       onClick={() => setHorarioSeleccionado(horario)}
                     >
-                      <div className="horario-info">
-                        <span className="dia">{horario.dia}</span>
-                        <span className="hora">{horario.hora}</span>
-                      </div>
-                      <div className="instructor-info">
-                        👤 {horario.instructor}
-                      </div>
-                      {horarioSeleccionado === horario && (
-                        <div className="check-mark">✓</div>
-                      )}
+                      <span>{horario.dia} - {horario.hora}</span>
+                      <span>👤 {horario.instructor}</span>
                     </div>
                   ))}
                 </div>
               </div>
+
               <div className="modal-footer">
-                <button 
-                  className="btn btn-success" 
+                <button
+                  className="btn btn-success"
                   onClick={registrarClase}
                   disabled={!horarioSeleccionado}
                 >
-                  {horarioSeleccionado ? '✅ Registrarme' : '⚠️ Selecciona un horario'}
+                  {horarioSeleccionado ? "✅ Registrarme" : "⚠️ Selecciona un horario"}
                 </button>
               </div>
             </div>

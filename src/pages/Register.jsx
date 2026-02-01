@@ -1,35 +1,35 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import "../CSS/Style.css";
 import "../CSS/register.css";
 
-function Register() {
+export default function Register() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    nombres: "",
-    apellidos: "",
-    cedula: "",
-    fecha: "",
-    correo: "",
-    direccion: "",
-    usuario: "",
-    password: "",
-    foto: ""
+  const [formData, setFormData] = useState({
+    nombre: '',
+    edad: '',
+    sexo: '',
+    peso: '',
+    estatura: '',
+    email: '',
+    password: '',
+    objetivo: '',
+    fotoPerfil: null
   });
-  //Configuracion de entorno
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleFoto = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      setForm({ ...form, foto: reader.result });
+      setFormData({ ...formData, fotoPerfil: reader.result });
     };
     reader.readAsDataURL(file);
   };
@@ -37,115 +37,110 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    localStorage.setItem("usuarioNV", JSON.stringify(form));
-    alert("Usuario registrado correctamente");
+    localStorage.setItem("usuarioNV", JSON.stringify(formData));
+
+    console.log("Datos listos para Firebase:", formData);
+    alert("¡Registro exitoso! Los datos de salud han sido guardados.");
 
     navigate("/login");
   };
 
   return (
     <div className="register-body">
-      {/* NAVBAR */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div className="container">
           <Link className="navbar-brand fw-bold" to="/">
             NUTRI<span className="text-success">•VIDA</span>
           </Link>
-
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Inicio</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">Sobre Nosotros</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/classes">Clases</Link>
-            </li>
+            <li className="nav-item"><Link className="nav-link" to="/">Inicio</Link></li>
+            <li className="nav-item"><Link className="nav-link" to="/login">Login</Link></li>
           </ul>
         </div>
       </nav>
 
-      {/* REGISTRO */}
       <section className="register-section">
         <div className="register-container">
-
-          {/* IZQUIERDA */}
           <div className="register-left">
-            <h1>
-              Registro en <span>NutriVida</span>
-            </h1>
-            <p>Completa tus datos para crear tu cuenta.</p>
-            <img src="/images/saludable.jpg" alt="NutriVida" />
+            <h1>Únete a <br /><span>NUTRI•VIDA</span></h1>
+            <p>Calcularemos tu plan basado en tus medidas y objetivos.</p>
+            <div className="reg-steps" style={{ textAlign: 'left', marginTop: '20px' }}>
+              <div className="step"> Perfil Nutricional</div>
+              <div className="step"> Plan Personalizado</div>
+              <div className="step"> Acceso a Clases</div>
+            </div>
+            <img src="/images/saludable.jpg" alt="NutriVida" style={{ marginTop: '20px', borderRadius: '15px' }} />
           </div>
 
-          {/* DERECHA */}
           <div className="register-right">
-            <h2>Crea tu cuenta</h2>
-
+            <h2>Crea tu Perfil Profesional</h2>
             <form onSubmit={handleSubmit} className="register-grid">
 
-              <div>
-                <label>Nombres:</label>
-                <input name="nombres" onChange={handleChange} required />
+              <div className="full">
+                <label>Nombre Completo</label>
+                <input type="text" name="nombre" placeholder="Ej. Juan Pérez" onChange={handleChange} required />
               </div>
 
               <div>
-                <label>Apellidos:</label>
-                <input name="apellidos" onChange={handleChange} required />
+                <label>Edad</label>
+                <input type="number" name="edad" placeholder="Años" onChange={handleChange} required />
               </div>
 
               <div>
-                <label>Cédula:</label>
-                <input name="cedula" onChange={handleChange} required />
+                <label>Sexo</label>
+                <select name="sexo" onChange={handleChange} required>
+                  <option value="">Seleccionar...</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="femenino">Femenino</option>
+                </select>
               </div>
 
               <div>
-                <label>Fecha de nacimiento:</label>
-                <input type="date" name="fecha" onChange={handleChange} required />
+                <label>Peso (kg)</label>
+                <input type="number" name="peso" placeholder="0.0" step="0.1" onChange={handleChange} required />
               </div>
 
               <div>
-                <label>Correo electrónico:</label>
-                <input type="email" name="correo" onChange={handleChange} required />
-              </div>
-
-              <div>
-                <label>Dirección:</label>
-                <input name="direccion" onChange={handleChange} required />
-              </div>
-
-              <div>
-                <label>Usuario:</label>
-                <input name="usuario" onChange={handleChange} required />
-              </div>
-
-              <div>
-                <label>Contraseña:</label>
-                <input type="password" name="password" onChange={handleChange} required />
+                <label>Estatura (cm)</label>
+                <input type="number" name="estatura" placeholder="cm" onChange={handleChange} required />
               </div>
 
               <div className="full">
-                <label>Foto de perfil:</label>
-                <input type="file" accept="image/*" onChange={handleFoto} />
+                <label>Objetivo</label>
+                <select name="objetivo" onChange={handleChange} required>
+                  <option value="">Seleccionar...</option>
+                  <option value="perder_peso">Perder Peso</option>
+                  <option value="ganar_musculo">Ganar Músculo</option>
+                  <option value="mantenerse">Mantenerse Saludable</option>
+                </select>
+              </div>
+
+              <div className="full">
+                <label>Correo Electrónico</label>
+                <input type="email" name="email" placeholder="correo@ejemplo.com" onChange={handleChange} required />
+              </div>
+
+              <div className="full">
+                <label>Contraseña</label>
+                <input type="password" name="password" placeholder="Mínimo 6 caracteres" onChange={handleChange} required />
+              </div>
+
+              <div className="full">
+                <label>Foto de Perfil</label>
+                <input type="file" accept="image/*" onChange={handleFileChange} />
               </div>
 
               <button className="btn-register full" type="submit">
-                Registrarse
+                Finalizar Registro
               </button>
-
             </form>
 
             <p className="register-text">
-              ¿Ya tienes una cuenta?{" "}
-              <Link to="/login">Iniciar sesión</Link>
+              ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
             </p>
           </div>
-
         </div>
       </section>
     </div>
   );
 }
-
-export default Register;

@@ -1,181 +1,84 @@
-.register-body {
-    margin: 0;
-    padding-top: 90px; /* espacio navbar fixed */
-    background: linear-gradient(135deg, #727473 40%, #529b9b 100%);
+.reg-hero {
     min-height: 100vh;
+    background: #07100e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 50px 20px;
+}
+
+.reg-container {
+    background: #fff;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.reg-side-info {
+    flex: 1;
+    background: linear-gradient(135deg, #10978c 0%, #0254a0 100%);
+    padding: 60px 40px;
+    color: white;
     display: flex;
     flex-direction: column;
-}
-
-.register-section {
-    padding: 40px 20px;
-    display: flex;
     justify-content: center;
-    align-items: center;
-    flex: 1;
 }
 
-.register-container {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(10px);
+.reg-side-info h2 { font-size: 2.5rem; margin-bottom: 20px; }
+.reg-side-info h2 span { color: #00ffcc; font-weight: 800; }
 
-    width: 95%;
-    max-width: 1100px;
-    border-radius: 20px;
-    display: flex;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+.reg-steps { margin-top: 30px; }
+.step { margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; }
+.step span {
+    background: rgba(255,255,255,0.2);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 15px; font-weight: bold;
 }
 
-/* IZQUIERDA */
-.register-left {
-    flex: 1;
-    padding: 40px;
-    color: white;
-}
+.reg-form-box { flex: 1.5; padding: 40px; background: white; }
+.reg-form-box h3 { color: #333; margin-bottom: 25px; font-size: 1.5rem; }
 
-.register-left h1 {
-    font-size: 2.4rem;
-    font-weight: bold;
-}
+.reg-grid { display: flex; flex-direction: column; gap: 15px; }
 
-.register-left span {
-    color: #27c7bf;
-}
+.input-row { display: flex; gap: 15px; width: 100%; }
+.triplet .field { flex: 1; }
+.field { display: flex; flex-direction: column; flex: 1; }
+.field.full { width: 100%; }
 
-.register-left p {
-    margin-top: 10px;
-    opacity: 0.9;
-}
-
-.register-left img {
-    width: 90%;
-    margin-top: 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-/* DERECHA */
-.register-right {
-    flex: 1.2;
-    background: #fafafa;
-    padding: 40px;
-}
-
-.register-right h2 {
-    text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-    color: #2c3e50;
-}
-
-/* FORMULARIO GRID */
-.register-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-/* Para inputs que ocupan 2 columnas */
-.full {
-    grid-column: span 2;
-}
-
-.register-grid label {
-    font-size: 0.9rem;
-    color: #333;
-}
-
-.register-grid input[type="text"],
-.register-grid input[type="email"],
-.register-grid input[type="password"],
-.register-grid input[type="file"] {
-    width: 100%;
+.field label { font-size: 0.85rem; font-weight: bold; color: #666; margin-bottom: 5px; }
+.field input, .field select {
     padding: 10px;
-    border: 1px solid #bbb;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    margin-top: 5px;
-    background: white;
+    font-size: 0.95rem;
 }
 
-/* BOTÓN */
-.btn-register {
-    grid-column: span 2;
-    background: linear-gradient(135deg, #8ae9d9, #717776);
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
+.field input:focus { border-color: #10978c; outline: none; }
+
+.btn-reg-pro {
+    background: #10978c;
     color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
     font-weight: bold;
-    margin-top: 10px;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: .3s;
+    transition: 0.3s;
+    margin-top: 10px;
 }
 
-.btn-register:hover {
-    background: linear-gradient(135deg, #983cbd, #7942d3);
-}
+.btn-reg-pro:hover { background: #0254a0; transform: translateY(-2px); }
 
-/* Texto inferior */
-.register-text {
-    margin-top: 15px;
-    text-align: center;
-    font-size: .9rem;
-}
+.login-prompt { text-align: center; margin-top: 15px; color: #777; font-size: 0.9rem; }
+.login-prompt a { color: #10978c; text-decoration: none; font-weight: bold; }
 
-.register-text a {
-    color: #8e44ad;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.register-text a:hover {
-    text-decoration: underline;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .register-container {
-        flex-direction: column;
-    }
-
-    .register-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .btn-register {
-        grid-column: span 1;
-    }
-}
-
-
-/* ================================
-  FOOTER
-==================================*/
-
-.footer-content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-
-.social-row img {
-  width: 24px;
-  transition: .3s;
-}
-
-.social-row img:hover {
-  transform: scale(1.2);
-}
-
-.register-text {
-    margin-top: 15px;
-    text-align: center;
-    font-size: .9rem;
-}
-
-.register-text a {
-    color: #8e44ad;
-    font-weight: bold;
-    text-decoration: none;
+@media (max-width: 850px) {
+    .reg-container { flex-direction: column; }
+    .reg-side-info { padding: 30px; }
 }

@@ -309,16 +309,3 @@ body {
   opacity: 0.9;
   letter-spacing: 0.3px;
 }
-/* ===== RESULTADO IMC ===== */
-.imc-section p,
-.imc-section {
-  color: #000;
-}
-
-.imc-section h2 {
-  font-weight: bold;
-}
-
-.imc-section p {
-  font-weight: 600;
-}

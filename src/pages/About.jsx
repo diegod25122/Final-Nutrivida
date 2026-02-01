@@ -15,7 +15,7 @@ function About() {
 
         <div className="about-cards">
           <div className="about-card">
-            <img src="/images/saludable.jpg" alt="Dieta saludable" />
+            <img src="/images/alimentacionSaludable.jpg" alt="Dieta saludable" />
             <h3>Planes de Alimentación</h3>
             <p>
               Ofrecemos guías adaptadas para cada objetivo: pérdida de grasa,
@@ -24,7 +24,7 @@ function About() {
           </div>
 
           <div className="about-card">
-            <img src="/images/cross.jpg" alt="Entrenamiento" />
+            <img src="/images/Entrenamiento_Personalizados.webp" alt="Entrenamiento" />
             <h3>Entrenamientos Personalizados</h3>
             <p>
               Rutinas estructuradas por expertos, ajustadas a tu nivel físico y
@@ -33,7 +33,7 @@ function About() {
           </div>
 
           <div className="about-card">
-            <img src="/images/gym.jpg" alt="Comunidad" />
+            <img src="/images/comunidad.jpeg" alt="Comunidad" />
             <h3>Comunidad Activa</h3>
             <p>
               Forma parte de una red de apoyo donde todos compartimos el mismo

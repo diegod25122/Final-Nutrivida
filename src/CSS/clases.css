@@ -274,3 +274,117 @@
   color: #009688;
   font-size: 1.1em;
 }
+/* ============================================
+   ESTILOS PARA SELECCIÓN DE HORARIOS
+   Agrega esto a tu clases.css
+   ============================================ */
+
+.horarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.horario-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 255, 180, 0.2);
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.horario-item:hover {
+  background: rgba(0, 255, 180, 0.1);
+  border-color: rgba(0, 255, 180, 0.5);
+  transform: translateX(5px);
+}
+
+.horario-item.selected {
+  background: rgba(0, 255, 180, 0.15);
+  border-color: #00ffc8;
+  box-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+}
+
+.horario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.horario-info .dia {
+  font-weight: 600;
+  color: #00ffc8;
+  font-size: 1.1rem;
+}
+
+.horario-info .hora {
+  color: #c8fff1;
+  font-size: 0.95rem;
+}
+
+.instructor-info {
+  color: #dffff6;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.check-mark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #4caf50;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  animation: checkPop 0.3s ease;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.modal-footer .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #666;
+}
+
+.modal-header h5 {
+  color: #00ffc8;
+  font-weight: 600;
+}
+
+.modal-body h6 {
+  color: #c8fff1;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .horario-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .check-mark {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}

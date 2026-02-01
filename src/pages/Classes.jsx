@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where
-} from "firebase/firestore";
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../CSS/Style.css";
 import "../CSS/clases.css";
 
 function Classes() {
+  const navigate = useNavigate();
   const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
   const [comentario, setComentario] = useState("");
   const [resultadoComentario, setResultadoComentario] = useState("");
 
@@ -20,78 +14,102 @@ function Classes() {
     {
       nombre: "Yoga",
       img: "/images/Yoga.png",
-      desc: "Fortalece cuerpo y mente con técnicas de respiración y equilibrio interior.",
+      horarios: [
+        { dia: "Lunes", hora: "08:00 - 09:00", instructor: "María López" },
+        { dia: "Miércoles", hora: "18:00 - 19:00", instructor: "Ana García" },
+        { dia: "Viernes", hora: "07:00 - 08:00", instructor: "María López" }
+      ]
     },
     {
       nombre: "Boxeo",
       img: "/images/guantes.png",
-      desc: "Mejora tu resistencia, coordinación y libera el estrés mientras entrenas.",
+      horarios: [
+        { dia: "Martes", hora: "10:00 - 11:00", instructor: "Juan Pérez" },
+        { dia: "Jueves", hora: "19:00 - 20:00", instructor: "Carlos Mendoza" },
+        { dia: "Sábado", hora: "09:00 - 10:00", instructor: "Juan Pérez" }
+      ]
     },
     {
       nombre: "Pilates",
       img: "/images/pilates.jpg",
-      desc: "Fortalece tu centro corporal y mejora tu postura con movimientos controlados.",
+      horarios: [
+        { dia: "Lunes", hora: "15:00 - 16:00", instructor: "Camila Torres" },
+        { dia: "Miércoles", hora: "17:00 - 18:00", instructor: "Laura Ruiz" },
+        { dia: "Viernes", hora: "16:00 - 17:00", instructor: "Camila Torres" }
+      ]
     },
     {
       nombre: "Aumento de Masa Muscular",
       img: "/images/masaMuscular.jpg",
-      desc: "Rutinas específicas y alimentación para lograr tu máximo rendimiento físico.",
+      horarios: [
+        { dia: "Lunes", hora: "17:00 - 18:30", instructor: "Carlos Rivera" },
+        { dia: "Miércoles", hora: "17:00 - 18:30", instructor: "Roberto Díaz" },
+        { dia: "Viernes", hora: "17:00 - 18:30", instructor: "Carlos Rivera" }
+      ]
     },
     {
       nombre: "Rehabilitación",
       img: "/images/Rehabilitacion.jpg",
-      desc: "Recupera movilidad y bienestar con ejercicios guiados por profesionales.",
+      horarios: [
+        { dia: "Martes", hora: "09:00 - 10:00", instructor: "Roberto Sánchez" },
+        { dia: "Jueves", hora: "14:00 - 15:00", instructor: "Patricia Vega" },
+        { dia: "Sábado", hora: "10:00 - 11:00", instructor: "Roberto Sánchez" }
+      ]
     },
     {
       nombre: "Culturismo",
       img: "/images/culturismo.jpg",
-      desc: "Entrenamiento avanzado para desarrollo muscular y estética física.",
+      horarios: [
+        { dia: "Martes", hora: "18:00 - 19:00", instructor: "Carlos Rivera" },
+        { dia: "Jueves", hora: "18:00 - 19:00", instructor: "Miguel Ángel" },
+        { dia: "Sábado", hora: "11:00 - 12:00", instructor: "Carlos Rivera" }
+      ]
     },
   ];
 
-  // ===============================
-  // REGISTRAR CLASE (FIRESTORE)
-  // ===============================
-  const registrarClase = async () => {
-    const user = auth.currentUser;
-
-    if (!user) {
-      alert("Debes iniciar sesión para registrar una clase");
-      window.location.href = "/login";
+  const registrarClase = () => {
+    if (!horarioSeleccionado) {
+      alert("Por favor selecciona un horario");
       return;
     }
 
-    try {
-      const ref = collection(db, "usuarios", user.uid, "clases");
-
-      // ❌ evitar duplicados
-      const q = query(ref, where("nombre", "==", claseSeleccionada.nombre));
-      const snap = await getDocs(q);
-
-      if (!snap.empty) {
-        alert("Ya estás registrado en esta clase");
-        return;
-      }
-
-      // ✅ guardar clase
-      await addDoc(ref, {
-        nombre: claseSeleccionada.nombre,
-        imagen: claseSeleccionada.img,
-        creadoEn: new Date()
-      });
-
-      alert(`Te registraste en ${claseSeleccionada.nombre} 💪🔥`);
-      setClaseSeleccionada(null);
-
-    } catch (error) {
-      alert("Error al registrar clase");
-      console.error(error);
+    const logueado = localStorage.getItem("logueado");
+    if (!logueado) {
+      alert("Debes iniciar sesión para registrar una clase");
+      navigate("/login");
+      return;
     }
+
+    const usuario = localStorage.getItem("nombreUsuario");
+    const key = `clases_${usuario}`;
+    const guardadas = JSON.parse(localStorage.getItem(key)) || [];
+
+    // Verificar si ya está registrado en esta clase con este horario
+    const yaRegistrado = guardadas.some(
+      c => c.nombre === claseSeleccionada.nombre && 
+           c.dia === horarioSeleccionado.dia && 
+           c.hora === horarioSeleccionado.hora
+    );
+
+    if (yaRegistrado) {
+      alert("Ya estás registrado en esta clase con este horario");
+      return;
+    }
+
+    guardadas.push({
+      nombre: claseSeleccionada.nombre,
+      imagen: claseSeleccionada.img,
+      dia: horarioSeleccionado.dia,
+      hora: horarioSeleccionado.hora,
+      instructor: horarioSeleccionado.instructor
+    });
+
+    localStorage.setItem(key, JSON.stringify(guardadas));
+    alert(`✅ Te registraste en ${claseSeleccionada.nombre}\n${horarioSeleccionado.dia} ${horarioSeleccionado.hora}\nInstructor: ${horarioSeleccionado.instructor}`);
+    setClaseSeleccionada(null);
+    setHorarioSeleccionado(null);
   };
 
-  // ===============================
-  // COMENTARIOS (LOCAL POR AHORA)
-  // ===============================
   const enviarComentario = (e) => {
     e.preventDefault();
     setResultadoComentario("✔ ¡Comentario enviado! Gracias por tu opinión.");
@@ -112,7 +130,10 @@ function Classes() {
             <div
               key={c.nombre}
               className="class-card dynamic-card"
-              onClick={() => setClaseSeleccionada(c)}
+              onClick={() => {
+                setClaseSeleccionada(c);
+                setHorarioSeleccionado(null);
+              }}
             >
               <img src={c.img} alt={c.nombre} />
               <h3>{c.nombre}</h3>
@@ -171,22 +192,58 @@ function Classes() {
         {resultadoComentario && <p className="fade-in">{resultadoComentario}</p>}
       </section>
 
-      {/* MODAL */}
+      {/* MODAL - SELECCIÓN DE HORARIOS */}
       {claseSeleccionada && (
         <div className="modal show d-block">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5>{claseSeleccionada.nombre}</h5>
-                <button className="btn-close" onClick={() => setClaseSeleccionada(null)} />
+                <h5>📅 {claseSeleccionada.nombre} - Elige tu horario</h5>
+                <button 
+                  className="btn-close" 
+                  onClick={() => {
+                    setClaseSeleccionada(null);
+                    setHorarioSeleccionado(null);
+                  }} 
+                />
               </div>
-              <div className="modal-body text-center">
-                <img src={claseSeleccionada.img} className="img-fluid rounded mb-3" />
-                <p>{claseSeleccionada.desc}</p>
+              <div className="modal-body">
+                <img 
+                  src={claseSeleccionada.img} 
+                  className="img-fluid rounded mb-3" 
+                  alt={claseSeleccionada.nombre}
+                />
+                
+                <h6 className="mb-3">Horarios Disponibles:</h6>
+                
+                <div className="horarios-list">
+                  {claseSeleccionada.horarios.map((horario, index) => (
+                    <div 
+                      key={index}
+                      className={`horario-item ${horarioSeleccionado === horario ? 'selected' : ''}`}
+                      onClick={() => setHorarioSeleccionado(horario)}
+                    >
+                      <div className="horario-info">
+                        <span className="dia">{horario.dia}</span>
+                        <span className="hora">{horario.hora}</span>
+                      </div>
+                      <div className="instructor-info">
+                        👤 {horario.instructor}
+                      </div>
+                      {horarioSeleccionado === horario && (
+                        <div className="check-mark">✓</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-success" onClick={registrarClase}>
-                  Registrarme 💪
+                <button 
+                  className="btn btn-success" 
+                  onClick={registrarClase}
+                  disabled={!horarioSeleccionado}
+                >
+                  {horarioSeleccionado ? '✅ Registrarme' : '⚠️ Selecciona un horario'}
                 </button>
               </div>
             </div>

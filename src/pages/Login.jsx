@@ -20,11 +20,7 @@ function Login() {
 
     try {
       // 🔐 Login con Firebase Auth
-      const cred = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const cred = await signInWithEmailAndPassword(auth, email, password);
 
       // 📄 Obtener datos del usuario desde Firestore
       const ref = doc(db, "usuarios", cred.user.uid);
@@ -37,10 +33,11 @@ function Login() {
 
       const datos = snap.data();
 
-      // 💾 Guardar sesión (solo lo necesario)
+      // 💾 Guardar sesión (CLAVES CONSISTENTES)
       localStorage.setItem("logueado", "true");
       localStorage.setItem("usuarioNV", JSON.stringify(datos));
-      localStorage.setItem("nombreUsuario", datos.nombres);
+      localStorage.setItem("userId", cred.user.uid);
+      localStorage.setItem("nombreUsuario", datos.nombres || "");
       localStorage.setItem(
         "fotoUsuario",
         datos.foto || "/images/defaultProfile.png"
@@ -49,9 +46,11 @@ function Login() {
       // 🔔 avisar al Navbar
       window.dispatchEvent(new Event("authChange"));
 
-      navigate("/");
+      // 👉 ir al dashboard
+      navigate("/dashboard");
 
     } catch (error) {
+      console.error(error);
       alert("Correo o contraseña incorrectos ❌");
     }
   };

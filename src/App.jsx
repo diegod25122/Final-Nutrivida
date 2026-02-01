@@ -8,8 +8,7 @@ import Classes from "./pages/Classes";
 import Access from "./pages/Access";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-
+import Dashboard from "./pages/Dashboard";
 function App() {
   return (
     <>
@@ -22,7 +21,7 @@ function App() {
         <Route path="/access" element={<Access />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
 
       <Footer />

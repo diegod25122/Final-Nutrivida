@@ -1,0 +1,309 @@
+/* ============================================
+   VARIABLES Y RESET (Asegúrate de tener estas variables)
+   ============================================ */
+:root {
+  --primary: #00ffb4;
+  --secondary: #00f2ea;
+}
+
+/* ============================================
+   DASHBOARD - LAYOUT PRINCIPAL
+   ============================================ */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #07100e, #0f2f27);
+  padding-top: 80px;
+}
+
+/* ============================================
+   SIDEBAR - PANEL LATERAL IZQUIERDO
+   ============================================ */
+.dashboard-sidebar {
+  width: 320px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(0, 255, 180, 0.2);
+  padding: 30px 20px;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--primary);
+  box-shadow: 0 0 25px rgba(0, 255, 200, 0.4);
+  flex-shrink: 0;
+}
+
+.profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-full-name {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.profile-view-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.user-info {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.user-info p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #dffff6;
+  line-height: 1.4;
+}
+
+.user-info strong {
+  color: var(--primary);
+  margin-right: 8px;
+}
+
+.btn-edit-profile {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #0b1116;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 25px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(0, 255, 200, 0.2);
+}
+
+.btn-edit-profile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 255, 200, 0.4);
+}
+
+/* FORMULARIO DE EDICIÓN */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+}
+
+.edit-form label {
+  color: var(--primary);
+  font-size: 0.85rem;
+  margin-bottom: -8px;
+  margin-left: 5px;
+}
+
+.edit-form input,
+.edit-form select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 180, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.95rem;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-save,
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-save { background: #4caf50; color: white; }
+.btn-cancel { background: #f44336; color: white; }
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+.dashboard-main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.dashboard-main h1 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.user-name-top {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.user-name-top h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   TARJETAS DE MÉTRICAS
+   ============================================ */
+.metrics-section {
+  margin-bottom: 50px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 180, 0.2);
+  border-radius: 20px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: 0.4s;
+}
+
+.metric-card.clickable:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary);
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
+}
+
+.metric-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.metric-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 10px 0;
+}
+
+/* ============================================
+   TABLA DE CLASES
+   ============================================ */
+.classes-table-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(0, 255, 180, 0.2);
+}
+
+.classes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.classes-table th {
+  padding: 15px;
+  text-align: left;
+  color: var(--primary);
+  border-bottom: 2px solid rgba(0, 255, 180, 0.3);
+}
+
+.classes-table td {
+  padding: 15px;
+  color: #dffff6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.class-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.class-info img {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* ============================================
+   MODALES
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: #111;
+  border: 1px solid var(--primary);
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.cronometro-display {
+  font-size: 3.5rem;
+  color: var(--primary);
+  font-family: monospace;
+  margin: 20px 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .dashboard-container { flex-direction: column; }
+  .dashboard-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 255, 180, 0.2);
+  }
+}

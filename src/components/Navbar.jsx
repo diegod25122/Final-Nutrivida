@@ -1,5 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import "../CSS/Style.css";
 
 function Navbar() {
@@ -9,39 +13,29 @@ function Navbar() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    const actualizarEstado = () => {
-      const estado = localStorage.getItem("logueado");
-      const datos = JSON.parse(localStorage.getItem("usuarioNV"));
-
-      if (estado === "true" && datos) {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
         setLogueado(true);
-        setUsuario(datos);
+
+        // 🔥 cargar datos desde Firestore
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setUsuario(docSnap.data());
+        }
       } else {
         setLogueado(false);
         setUsuario(null);
       }
-    };
+    });
 
-    // 🔥 al cargar la app
-    actualizarEstado();
-
-    // 🔥 escuchar cambios de login / logout
-    window.addEventListener("authChange", actualizarEstado);
-
-    return () => {
-      window.removeEventListener("authChange", actualizarEstado);
-    };
+    return () => unsub();
   }, []);
 
-  const cerrarSesion = () => {
-    // ❌ NO BORRAR TODO
-    localStorage.removeItem("logueado");
-    localStorage.removeItem("nombreUsuario");
-    localStorage.removeItem("fotoUsuario");
-
-    // 🔥 avisar al navbar
-    window.dispatchEvent(new Event("authChange"));
-
+  const cerrarSesion = async () => {
+    await signOut(auth);
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -68,7 +62,6 @@ function Navbar() {
               <Link className="nav-link" to="/classes">Clases</Link>
             </li>
 
-            {/* 🔓 NO LOGUEADO */}
             {!logueado && (
               <li className="nav-item ms-2">
                 <Link className="btn btn-success" to="/register">
@@ -77,7 +70,6 @@ function Navbar() {
               </li>
             )}
 
-            {/* 🔒 LOGUEADO */}
             {logueado && usuario && (
               <li className="nav-item dropdown ms-3">
                 <a
@@ -90,19 +82,15 @@ function Navbar() {
                     src={usuario.foto || "/images/defaultProfile.png"}
                     alt="perfil"
                     className="rounded-circle me-2"
-                    style={{
-                      width: "35px",
-                      height: "35px",
-                      objectFit: "cover"
-                    }}
+                    style={{ width: "35px", height: "35px", objectFit: "cover" }}
                   />
-                  {usuario.usuario}
+                  {usuario.nombres}
                 </a>
 
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li>
-                    <Link className="dropdown-item" to="/profile">
-                      Mi perfil
+                    <Link className="dropdown-item" to="/dashboard">
+                      Mi Perfil
                     </Link>
                   </li>
                   <li><hr className="dropdown-divider" /></li>

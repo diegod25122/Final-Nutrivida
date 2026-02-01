@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Importar iconos
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 import "../CSS/register.css";
@@ -33,6 +33,7 @@ export default function Register() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = () => {
       setFormData({ ...formData, foto: reader.result });
@@ -49,26 +50,27 @@ export default function Register() {
     }
 
     try {
-      // 1️⃣ Crear usuario en Firebase Auth
+      // Crear usuario en Firebase Auth
       const cred = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
 
-      // 2️⃣ Guardar datos del perfil en Firestore
+      // Guardar perfil en Firestore con UID como ID
       await setDoc(doc(db, "usuarios", cred.user.uid), {
         uid: cred.user.uid,
+        role: "user", //rol 
         nombres: formData.nombres,
         apellidos: formData.apellidos,
         email: formData.email,
-        edad: formData.edad,
-        peso: formData.peso,
-        estatura: formData.estatura,
+        edad: Number(formData.edad),
+        peso: Number(formData.peso),
+        estatura: Number(formData.estatura),
         sexo: formData.sexo,
         objetivo: formData.objetivo,
-        foto: formData.foto,
-        creadoEn: new Date()
+        foto: formData.foto || null,
+        fechaRegistro: serverTimestamp()
       });
 
       alert("¡Cuenta creada con éxito! 💪🔥");
@@ -78,7 +80,6 @@ export default function Register() {
       alert("Error al registrar: " + error.message);
     }
   };
-
 
   return (
     <div className="new-register-view">
@@ -99,72 +100,31 @@ export default function Register() {
           <div className="input-row">
             <div className="input-item">
               <label>Nombres</label>
-              <input
-                type="text"
-                name="nombres"
-                placeholder="Ej. Juan"
-                value={formData.nombres}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="nombres" value={formData.nombres} onChange={handleChange} required />
             </div>
             <div className="input-item">
               <label>Apellidos</label>
-              <input
-                type="text"
-                name="apellidos"
-                placeholder="Ej. Pérez García"
-                value={formData.apellidos}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="apellidos" value={formData.apellidos} onChange={handleChange} required />
             </div>
           </div>
 
           <div className="input-item full-row">
             <label>Foto de Perfil (Opcional)</label>
-            <input type="file" accept="image/*" onChange={handleFileChange} className="file-input" />
+            <input type="file" accept="image/*" onChange={handleFileChange} />
           </div>
 
           <div className="input-row triplet">
             <div className="input-item">
               <label>Edad</label>
-              <input
-                type="number"
-                name="edad"
-                placeholder="Años"
-                min="1"
-                max="120"
-                value={formData.edad}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" name="edad" value={formData.edad} onChange={handleChange} required />
             </div>
             <div className="input-item">
               <label>Peso (kg)</label>
-              <input
-                type="number"
-                name="peso"
-                placeholder="0.0"
-                step="0.1"
-                min="1"
-                value={formData.peso}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" step="0.1" name="peso" value={formData.peso} onChange={handleChange} required />
             </div>
             <div className="input-item">
               <label>Estatura (cm)</label>
-              <input
-                type="number"
-                name="estatura"
-                placeholder="cm"
-                min="50"
-                max="250"
-                value={formData.estatura}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" name="estatura" value={formData.estatura} onChange={handleChange} required />
             </div>
           </div>
 
@@ -189,14 +149,7 @@ export default function Register() {
 
           <div className="input-item full-row">
             <label>Correo Electrónico</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="correo@ejemplo.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+            <input type="email" name="email" value={formData.email} onChange={handleChange} required />
           </div>
 
           <div className="input-item full-row">
@@ -205,20 +158,13 @@ export default function Register() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Mínimo 6 caracteres"
-                minLength="6"
                 value={formData.password}
                 onChange={handleChange}
                 required
               />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+              <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)} 
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} > 
+              {showPassword ? <FaEyeSlash /> : <FaEye />} </button>
             </div>
           </div>
 

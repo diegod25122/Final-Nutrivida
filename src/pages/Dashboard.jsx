@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+
+
 import "../CSS/dashboard.css";
 
 function Dashboard() {
@@ -114,13 +119,39 @@ function Dashboard() {
     setFormEdit({ ...formEdit, [name]: value });
   };
 
-  const guardarCambiosPerfil = () => {
+const guardarCambiosPerfil = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Sesión no válida");
+      return;
+    }
+
+    // 🔥 ACTUALIZAR EN FIRESTORE
+    const ref = doc(db, "usuarios", user.uid);
+
+    await updateDoc(ref, {
+      edad: formEdit.edad,
+      peso: formEdit.peso,
+      estatura: formEdit.estatura,
+      objetivo: formEdit.objetivo,
+      actualizadoEn: new Date()
+    });
+
+    // 💾 ACTUALIZAR LOCAL (para no romper nada)
     localStorage.setItem("usuarioNV", JSON.stringify(formEdit));
     setUsuario(formEdit);
     setEditandoPerfil(false);
     calcularCaloriasRecomendadas(formEdit);
-    alert("✅ Perfil actualizado correctamente");
-  };
+
+    alert(" Perfil actualizado correctamente");
+
+  } catch (error) {
+    console.error(error);
+    alert(" Error al actualizar perfil");
+  }
+};
+
 
   if (!usuario) {
     return <div className="loading">Cargando tu dashboard...</div>;

@@ -307,3 +307,32 @@
     border-bottom: 1px solid rgba(0, 255, 180, 0.2);
   }
 }
+/* ============================================
+   BOTÓN VER RECETAS EN DASHBOARD
+   Agrega esto al final de tu dashboard.css
+   ============================================ */
+
+.btn-ver-recetas {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.btn-ver-recetas:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(255, 107, 107, 0.5);
+  background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+}
+
+.btn-ver-recetas:active {
+  transform: scale(0.98);
+}

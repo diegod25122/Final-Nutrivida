@@ -1,67 +1,178 @@
-/* =========================
-   SECCIÓN CLASES
-========================= */
+/* ============================================
+   MEJORAS PARA LAS TARJETAS DE CLASES
+   Agrega esto a tu clases.css
+   ============================================ */
+
 .classes-section {
-  text-align: center;
-  padding: 80px 20px;
+  padding: 120px 20px 80px;
+  min-height: 100vh;
 }
 
 .classes-section h1 {
-  font-size: 2.5em;
-  color: #1b9a9a;
-  margin-bottom: 10px;
-}
-
-.classes-section p {
-  color: #ffffff;
+  text-align: center;
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .subtitle {
-  font-size: 1.1em;
-  color: #555;
-  margin-bottom: 40px;
+  text-align: center;
+  color: #c8fff1;
+  font-size: 1.1rem;
+  margin-bottom: 50px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* CONTENEDOR DE CLASES */
 .class-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 25px;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
+/* TARJETAS DE CLASES */
 .class-card {
-  background: #fcfcfc;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(0, 255, 180, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
   cursor: pointer;
-
-  /*  Forzar altura uniforme */
-  min-height: 280px;
+  transition: all 0.4s ease;
+  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  padding: 30px;
+  position: relative;
+}
+
+.class-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(0, 255, 180, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.class-card:hover::before {
+  opacity: 1;
 }
 
 .class-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 255, 200, 0.3);
+  border-color: var(--primary);
 }
 
 .class-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 5px 15px rgba(0, 255, 180, 0.3));
+  transition: transform 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.class-card:hover img {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .class-card h3 {
-  color: #333;
-  font-size: 1.3em;
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 600;
   margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ANIMACIÓN DINÁMICA */
+.dynamic-card {
+  animation: fadeInUp 0.6s ease backwards;
+}
+
+.dynamic-card:nth-child(1) { animation-delay: 0.1s; }
+.dynamic-card:nth-child(2) { animation-delay: 0.2s; }
+.dynamic-card:nth-child(3) { animation-delay: 0.3s; }
+.dynamic-card:nth-child(4) { animation-delay: 0.4s; }
+.dynamic-card:nth-child(5) { animation-delay: 0.5s; }
+.dynamic-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .class-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .classes-section {
+    padding: 100px 15px 60px;
+  }
+
+  .classes-section h1 {
+    font-size: 2rem;
+  }
+
+  .class-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .class-card {
+    padding: 25px;
+  }
+
+  .class-card img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .class-card h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .class-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .class-card {
+    aspect-ratio: auto;
+    padding: 30px;
+  }
 }
 
 /* =========================
@@ -220,159 +331,338 @@
   font-size: 1.2rem;
   margin-bottom: 5px;
 }
-
-/* =========================
-   SECCIÓN PROMOCIONES
-========================= */
-.promo-section {
-  background: linear-gradient(135deg, #a8a8a8, #ffffff);
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.promo-section h2 {
-  color: #00796b;
-  margin-bottom: 40px;
-  font-size: 2.2em;
-}
-
-.promo-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 25px;
-}
-
-.promo-card {
-  background-color: white;
-  border-radius: 15px;
-  width: 260px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.promo-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-}
-
-.promo-card h3 {
-  color: #004d40;
-  margin-bottom: 10px;
-}
-
-.promo-card p {
-  color: #666;
-  font-size: 0.95em;
-}
-
-.promo-card span {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-  color: #009688;
-  font-size: 1.1em;
-}
 /* ============================================
-   ESTILOS PARA SELECCIÓN DE HORARIOS
-   Agrega esto a tu clases.css
+   MODAL DE HORARIOS - VERSIÓN COMPACTA CON FADE
+   Reemplaza los estilos del modal en clases.css
    ============================================ */
 
-.horarios-list {
+/* MODAL OVERLAY CON FADE */
+.modal.show {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(8px);
+  animation: fadeInOverlay 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* MODAL DIALOG - MÁS ANGOSTO */
+.modal-dialog {
+  max-width: 420px !important; /* Más angosto que antes (era 550px) */
+  margin: 2rem auto !important;
+  animation: modalSlideUp 0.4s ease;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* MODAL CONTENT */
+.modal-content {
+  background: linear-gradient(135deg, #0b1116, #1a2a2e) !important;
+  border: 2px solid rgba(0, 255, 180, 0.3) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 50px rgba(0, 255, 200, 0.3) !important;
+  overflow: hidden;
+}
+
+/* MODAL HEADER */
+.modal-header {
+  background: rgba(0, 255, 180, 0.1);
+  border-bottom: 1px solid rgba(0, 255, 180, 0.3) !important;
+  padding: 18px 20px;
+}
+
+.modal-header h5 {
+  color: #00ffc8 !important;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* BOTÓN CERRAR (X) - VISIBLE Y BONITO */
+.btn-close {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  opacity: 1 !important;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 350px;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-close:hover {
+  background: rgba(255, 107, 107, 0.95) !important;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.btn-close::before {
+  content: "✕";
+  color: #0b1116;
+  font-size: 1.2rem;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* MODAL BODY */
+.modal-body {
+  padding: 20px;
+  max-height: 65vh;
   overflow-y: auto;
 }
 
+.modal-body h6 {
+  color: #c8fff1;
+  font-weight: 600;
+  margin-bottom: 18px;
+  font-size: 1rem;
+}
+
+/* IMAGEN DE LA CLASE - MÁS PEQUEÑA */
+.modal-body .img-fluid {
+  max-height: 160px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 2px solid rgba(0, 255, 180, 0.2);
+}
+
+/* LISTA DE HORARIOS */
+.horarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* SCROLLBAR DE HORARIOS */
+.horarios-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.horarios-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.horarios-list::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+.horarios-list::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+/* ITEM DE HORARIO - MÁS COMPACTO */
 .horario-item {
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(0, 255, 180, 0.2);
-  border-radius: 12px;
-  padding: 15px;
+  border-radius: 10px;
+  padding: 12px 15px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .horario-item:hover {
   background: rgba(0, 255, 180, 0.1);
   border-color: rgba(0, 255, 180, 0.5);
-  transform: translateX(5px);
+  transform: translateX(3px);
 }
 
 .horario-item.selected {
   background: rgba(0, 255, 180, 0.15);
   border-color: #00ffc8;
-  box-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
 }
 
+/* INFO DEL HORARIO */
 .horario-info {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .horario-info .dia {
   font-weight: 600;
   color: #00ffc8;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .horario-info .hora {
   color: #c8fff1;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
+/* INFO DEL INSTRUCTOR */
 .instructor-info {
   color: #dffff6;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 255, 180, 0.1);
 }
 
+/* CHECK MARK */
 .check-mark {
   position: absolute;
   top: 10px;
   right: 10px;
   background: #4caf50;
   color: white;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   animation: checkPop 0.3s ease;
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.5);
 }
 
 @keyframes checkPop {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* MODAL FOOTER */
+.modal-footer {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(0, 255, 180, 0.3) !important;
+  padding: 18px 20px;
+}
+
+.modal-footer .btn {
+  padding: 11px 25px;
+  border-radius: 22px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: none;
+  width: 100%;
+}
+
+.modal-footer .btn-success {
+  background: linear-gradient(135deg, #4caf50, #45a049) !important;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.modal-footer .btn-success:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
 }
 
 .modal-footer .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #666;
+  background: #666 !important;
+  transform: none !important;
 }
 
-.modal-header h5 {
-  color: #00ffc8;
-  font-weight: 600;
+/* EFECTO DE SALIDA (FADE OUT) */
+.modal.fade:not(.show) {
+  animation: fadeOutModal 0.3s ease;
 }
 
-.modal-body h6 {
-  color: #c8fff1;
-  font-weight: 600;
-  margin-bottom: 15px;
+@keyframes fadeOutModal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem !important;
+    max-width: calc(100% - 2rem) !important;
+  }
+
+  .modal-body {
+    padding: 18px;
+    max-height: 60vh;
+  }
+
+  .modal-body .img-fluid {
+    max-height: 130px;
+  }
+
+  .horario-item {
+    padding-right: 45px;
+  }
+
+  .check-mark {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px;
+  }
+
+  .check-mark.selected {
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-dialog {
+    max-width: calc(100% - 1rem) !important;
+    margin: 0.5rem !important;
+  }
+
+  .modal-header h5 {
+    font-size: 1.05rem;
+  }
+
+  .horario-info .dia {
+    font-size: 0.95rem;
+  }
+
+  .horario-info .hora {
+    font-size: 0.8rem;
+  }
+
+  .instructor-info {
+    font-size: 0.8rem;
+  }
 }
 
 /* Responsive */

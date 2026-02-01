@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -8,18 +8,14 @@ import Classes from "./pages/Classes";
 import Access from "./pages/Access";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 import Dashboard from "./pages/Dashboard";
-import Admin from "./pages/admin";
+import Recetas from "./pages/Recetas"; 
 
 function App() {
-  const location = useLocation();
-
-  const ocultarLayout = location.pathname === "/admin";
-
   return (
     <>
-      {/*  NO Navbar en /admin */}
-      {!ocultarLayout && <Navbar />}
+      <Navbar />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -28,12 +24,12 @@ function App() {
         <Route path="/access" element={<Access />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+    
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/recetas" element={<Recetas />} /> {/* ← NUEVA RUTA */}
       </Routes>
 
-      {/*  NO Footer en /admin */}
-      {!ocultarLayout && <Footer />}
+      <Footer />
     </>
   );
 }

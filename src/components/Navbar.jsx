@@ -9,21 +9,39 @@ function Navbar() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    const estado = localStorage.getItem("logueado");
-    const datos = JSON.parse(localStorage.getItem("usuarioNV"));
+    const actualizarEstado = () => {
+      const estado = localStorage.getItem("logueado");
+      const datos = JSON.parse(localStorage.getItem("usuarioNV"));
 
-    if (estado === "true" && datos) {
-      setLogueado(true);
-      setUsuario(datos);
-    } else {
-      setLogueado(false);
-      setUsuario(null);
-    }
+      if (estado === "true" && datos) {
+        setLogueado(true);
+        setUsuario(datos);
+      } else {
+        setLogueado(false);
+        setUsuario(null);
+      }
+    };
+
+    // 🔥 al cargar la app
+    actualizarEstado();
+
+    // 🔥 escuchar cambios de login / logout
+    window.addEventListener("authChange", actualizarEstado);
+
+    return () => {
+      window.removeEventListener("authChange", actualizarEstado);
+    };
   }, []);
 
   const cerrarSesion = () => {
-    localStorage.clear();
-    setLogueado(false);
+    // ❌ NO BORRAR TODO
+    localStorage.removeItem("logueado");
+    localStorage.removeItem("nombreUsuario");
+    localStorage.removeItem("fotoUsuario");
+
+    // 🔥 avisar al navbar
+    window.dispatchEvent(new Event("authChange"));
+
     navigate("/login");
   };
 
@@ -72,7 +90,11 @@ function Navbar() {
                     src={usuario.foto || "/images/defaultProfile.png"}
                     alt="perfil"
                     className="rounded-circle me-2"
-                    style={{ width: "35px", height: "35px", objectFit: "cover" }}
+                    style={{
+                      width: "35px",
+                      height: "35px",
+                      objectFit: "cover"
+                    }}
                   />
                   {usuario.usuario}
                 </a>
@@ -85,7 +107,10 @@ function Navbar() {
                   </li>
                   <li><hr className="dropdown-divider" /></li>
                   <li>
-                    <button className="dropdown-item text-danger" onClick={cerrarSesion}>
+                    <button
+                      className="dropdown-item text-danger"
+                      onClick={cerrarSesion}
+                    >
                       Cerrar sesión
                     </button>
                   </li>

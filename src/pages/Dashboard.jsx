@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../firebase"; // Ajusta la ruta según tu estructura
+import { updateEmail } from "firebase/auth";
+import Swal from 'sweetalert2';
+import { arrayRemove } from "firebase/firestore";
+import { db, auth } from "../firebase"; // Ajusta la ruta según tu estructura
 import "../CSS/dashboard.css";
 
 function Dashboard() {
@@ -69,10 +72,17 @@ function Dashboard() {
     if (pasosGuardados) setObjetivoPasos(pasosGuardados);
 
     // Cargar clases inscritas (localStorage)
-    const nombreUsuario = localStorage.getItem("nombreUsuario");
-    const clasesKey = `clases_${nombreUsuario}`;
-    const clases = JSON.parse(localStorage.getItem(clasesKey)) || [];
-    setClasesInscritas(clases);
+    const user = auth.currentUser;
+    if (user) {
+      const ref = doc(db, "usuarios", user.uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        setClasesInscritas(data.clases || []);
+      }
+    }
+
   };
 
   useEffect(() => {
@@ -139,20 +149,43 @@ function Dashboard() {
     reader.readAsDataURL(file);
   };
 
-  const salirDeClase = (nombreClase, dia, hora) => {
-    const confirmar = window.confirm(`¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`);
-    if (!confirmar) return;
+const salirDeClase = async (nombreClase, dia, hora) => {
+  const confirmar = window.confirm(
+    `¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`
+  );
+  if (!confirmar) return;
 
-    const nombreUsuario = localStorage.getItem("nombreUsuario");
-    const clasesKey = `clases_${nombreUsuario}`;
-    const clasesActualizadas = clasesInscritas.filter(
-      c => !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const claseAEliminar = clasesInscritas.find(
+    c => c.nombre === nombreClase && c.dia === dia && c.hora === hora
+  );
+
+  if (!claseAEliminar) return;
+
+  try {
+    const ref = doc(db, "usuarios", user.uid);
+
+    await updateDoc(ref, {
+      clases: arrayRemove(claseAEliminar)
+    });
+
+    // Actualiza el estado local
+    setClasesInscritas(prev =>
+      prev.filter(
+        c =>
+          !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
+      )
     );
 
-    localStorage.setItem(clasesKey, JSON.stringify(clasesActualizadas));
-    setClasesInscritas(clasesActualizadas);
-    alert(`Te has dado de baja de ${nombreClase}`);
-  };
+    alert(`🚪 Saliste de ${nombreClase}`);
+  } catch (error) {
+    console.error(error);
+    alert("Error al salir de la clase");
+  }
+};
+
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -161,11 +194,14 @@ function Dashboard() {
 
   const guardarCambiosPerfil = async () => {
     const userId = localStorage.getItem("userId");
+    const userAuth = auth.currentUser;
 
     try {
-      const docRef = doc(db, "usuarios", userId);
+      if (userAuth && formEdit.email !== userAuth.email) {
+        await updateEmail(userAuth, formEdit.email);
+      }
 
-      // 1. Preparamos el objeto con los nombres de campos exactos de tu base de datos
+      const docRef = doc(db, "usuarios", userId);
       const nuevosDatos = {
         nombres: formEdit.nombres,
         apellidos: formEdit.apellidos,
@@ -177,26 +213,36 @@ function Dashboard() {
         foto: formEdit.foto || null
       };
 
-      // 2. Actualizamos Firebase (Esto es lo que ve tu compañero)
       await updateDoc(docRef, nuevosDatos);
 
-      // 3. Actualizamos React y LocalStorage (Esto es lo que ves tú)
-      // Usamos 'nuevosDatos' para asegurar que el storage tenga el email actualizado
       const perfilCompleto = { ...usuario, ...nuevosDatos };
-
       setUsuario(perfilCompleto);
       setEditandoPerfil(false);
-
-      // Recalculamos con los datos frescos
-      calcularCaloriasRecomendadas(perfilCompleto);
-
-      // Sobrescribimos el local storage con la info nueva
       localStorage.setItem("usuarioData", JSON.stringify(perfilCompleto));
 
-      alert("✅ ¡Perfil actualizado! Los cambios se reflejarán en todo el sistema.");
+      // --- DIÁLOGO BONITO AQUÍ ---
+      Swal.fire({
+        title: '¡Perfil Actualizado!',
+        text: 'Tus cambios se han guardado con éxito. Ya puedes usar tu nuevo correo.',
+        icon: 'success',
+        confirmButtonColor: '#4caf50',
+        confirmButtonText: 'Genial',
+        background: '#1a1a1a', // Color oscuro para que combine con tu dashboard
+        color: '#ffffff'
+      });
+
     } catch (error) {
-      console.error("Error al actualizar:", error);
-      alert("Error al actualizar el perfil");
+      console.error(error);
+      Swal.fire({
+        title: 'Ups...',
+        text: error.code === 'auth/requires-recent-login'
+          ? 'Por seguridad, debes re-iniciar sesión para cambiar tu correo.'
+          : 'Hubo un error al guardar los cambios.',
+        icon: 'error',
+        confirmButtonColor: '#f44336',
+        background: '#1a1a1a',
+        color: '#ffffff'
+      });
     }
   };
 

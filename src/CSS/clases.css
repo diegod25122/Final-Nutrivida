@@ -1,7 +1,4 @@
-/* ============================================
-   MEJORAS PARA LAS TARJETAS DE CLASES
-   Agrega esto a tu clases.css
-   ============================================ */
+/* MEJORAS PARA LAS TARJETAS DE CLASES */
 
 .classes-section {
   padding: 120px 20px 80px;
@@ -124,9 +121,7 @@
   }
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/*  RESPONSIVE */
 
 @media (max-width: 1200px) {
   .class-container {
@@ -331,10 +326,7 @@
   font-size: 1.2rem;
   margin-bottom: 5px;
 }
-/* ============================================
-   MODAL DE HORARIOS - VERSIÓN COMPACTA CON FADE
-   Reemplaza los estilos del modal en clases.css
-   ============================================ */
+/* MODAL DE HORARIOS - VERSIÓN COMPACTA CON FADE */
 
 /* MODAL OVERLAY CON FADE */
 .modal.show {

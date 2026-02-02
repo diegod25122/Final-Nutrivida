@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase";
+import Swal from "sweetalert2";
 
 import "../CSS/Style.css";
 import "../CSS/clases.css";
@@ -74,14 +75,29 @@ function Classes() {
 
 const registrarClase = async () => {
   if (!horarioSeleccionado) {
-    alert("Por favor selecciona un horario");
+    Swal.fire({
+      icon: "warning",
+      title: "Selecciona un horario",
+      text: "Por favor selecciona un horario para registrarte",
+      confirmButtonColor: "#ff9800",
+      background: "#1a1a1a",
+      color: "#ffffff"
+    });
     return;
   }
 
   const user = auth.currentUser;
   if (!user) {
-    alert("Debes iniciar sesión");
-    navigate("/login");
+    Swal.fire({
+      icon: "error",
+      title: "Sesión requerida",
+      text: "Debes iniciar sesión para registrarte en una clase",
+      confirmButtonColor: "#f44336",
+      background: "#1a1a1a",
+      color: "#ffffff"
+    }).then(() => {
+      navigate("/login");
+    });
     return;
   }
 
@@ -100,7 +116,7 @@ const registrarClase = async () => {
     clases: arrayUnion(nuevaClase)
   });
 
-  // 💾 SEGUIR GUARDANDO EN LOCAL (para no romper dashboard)
+  // 💾 SEGUIR GUARDANDO EN LOCAL (NO TOCAR)
   const usuario = localStorage.getItem("nombreUsuario");
   const key = `clases_${usuario}`;
   const guardadas = JSON.parse(localStorage.getItem(key)) || [];
@@ -113,16 +129,29 @@ const registrarClase = async () => {
   );
 
   if (yaRegistrado) {
-    alert("Ya estás registrado en esta clase con este horario");
+    Swal.fire({
+      icon: "info",
+      title: "Clase ya registrada",
+      text: "Ya estás registrado en esta clase con ese horario",
+      confirmButtonColor: "#2196f3",
+      background: "#1a1a1a",
+      color: "#ffffff"
+    });
     return;
   }
 
   guardadas.push(nuevaClase);
   localStorage.setItem(key, JSON.stringify(guardadas));
 
-  alert(
-    `✅ Te registraste en ${nuevaClase.nombre}\n${nuevaClase.dia} ${nuevaClase.hora}\nInstructor: ${nuevaClase.instructor}`
-  );
+  Swal.fire({
+    icon: "success",
+    title: "¡Registro exitoso!",
+    text: `${nuevaClase.nombre} - ${nuevaClase.dia} ${nuevaClase.hora}
+Instructor: ${nuevaClase.instructor}`,
+    confirmButtonColor: "#4caf50",
+    background: "#1a1a1a",
+    color: "#ffffff"
+  });
 
   setClaseSeleccionada(null);
   setHorarioSeleccionado(null);

@@ -1,14 +1,10 @@
-/* ============================================
-   VARIABLES Y RESET (Asegúrate de tener estas variables)
-   ============================================ */
+/*VARIABLES Y RESET*/
 :root {
   --primary: #00ffb4;
   --secondary: #00f2ea;
 }
 
-/* ============================================
-   DASHBOARD - LAYOUT PRINCIPAL
-   ============================================ */
+/*DASHBOARD - LAYOUT PRINCIPAL */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -16,9 +12,7 @@
   padding-top: 80px;
 }
 
-/* ============================================
-   SIDEBAR - PANEL LATERAL IZQUIERDO
-   ============================================ */
+/*SIDEBAR - PANEL LATERAL IZQUIERDO*/
 .dashboard-sidebar {
   width: 310px;
   background: rgba(255, 255, 255, 0.05);
@@ -184,9 +178,7 @@
 .btn-cancel:active {
   transform: scale(0.95);
 }
-/* ============================================
-   CONTENIDO PRINCIPAL
-   ============================================ */
+/*CONTENIDO PRINCIPAL*/
 .dashboard-main {
   flex: 1;
   padding: 40px;
@@ -211,9 +203,7 @@
   font-weight: 700;
 }
 
-/* ============================================
-   TARJETAS DE MÉTRICAS
-   ============================================ */
+/*TARJETAS DE MÉTRICAS*/
 .metrics-section {
   margin-bottom: 50px;
 }
@@ -252,9 +242,7 @@
   margin: 10px 0;
 }
 
-/* ============================================
-   TABLA DE CLASES
-   ============================================ */
+/*TABLA DE CLASES*/
 .classes-table-section {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
@@ -293,9 +281,7 @@
   object-fit: cover;
 }
 
-/* ============================================
-   MODALES
-   ============================================ */
+/*MODALES*/
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -322,9 +308,7 @@
   margin: 20px 0;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/*RESPONSIVE*/
 @media (max-width: 1024px) {
   .dashboard-container { flex-direction: column; }
   .dashboard-sidebar {
@@ -336,10 +320,7 @@
     border-bottom: 1px solid rgba(0, 255, 180, 0.2);
   }
 }
-/* ============================================
-   BOTÓN VER RECETAS EN DASHBOARD
-   Agrega esto al final de tu dashboard.css
-   ============================================ */
+/*BOTÓN VER RECETAS EN DASHBOARD*/
 
 .btn-ver-recetas {
   margin-top: 20px;

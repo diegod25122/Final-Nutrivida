@@ -2,34 +2,36 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
+import Swal from "sweetalert2";
+
 import "../CSS/Style.css";
 
 function Home() {
-  // ======================
+
   // FRASES MOTIVACIONALES
-  // ======================
   const frases = [
-    "Cada día es una nueva oportunidad para mejorar.",
-    "Tu único límite eres tú mismo.",
-    "La disciplina supera al talento.",
-    "Pequeños pasos te llevan a grandes cambios.",
-    "Cree en ti y todo será posible.",
-    "Hoy es un buen día para empezar."
+    "🌱 Cada día es una nueva oportunidad para mejorar y crecer.",
+    "🚀 Tu único límite eres tú mismo, atrévete a superarte.",
+    "🔥 La disciplina supera al talento cuando eres constante.",
+    "👣 Pequeños pasos te llevan a grandes cambios con el tiempo.",
+    "💚 Cree en ti y en tu proceso, todo será posible.",
+    "☀️ Hoy es un buen día para empezar algo mejor para ti."
   ];
+
 
   const [fraseIndex, setFraseIndex] = useState(0);
 
-  // ======================
   // SESIÓN (FIREBASE)
-  // ======================
+
   const [logueado, setLogueado] = useState(false);
 
-  // ======================
+
   // IMC
-  // ======================
+  const [recomendacion, setRecomendacion] = useState("");
   const [peso, setPeso] = useState("");
   const [altura, setAltura] = useState("");
   const [resultado, setResultado] = useState("");
+
 
   useEffect(() => {
     // 🔄 Rotar frases
@@ -37,7 +39,7 @@ function Home() {
       setFraseIndex((prev) => (prev + 1) % frases.length);
     }, 5000);
 
-    // 🔥 ESCUCHAR SESIÓN REAL DE FIREBASE
+    // ESCUCHAR SESIÓN REAL DE FIREBASE
     const unsub = onAuthStateChanged(auth, (user) => {
       setLogueado(!!user);
     });
@@ -48,27 +50,81 @@ function Home() {
     };
   }, []);
 
-  // ======================
+
   // CALCULAR IMC
-  // ======================
+
   const calcularIMC = (e) => {
     e.preventDefault();
 
     if (peso <= 0 || altura <= 0) {
-      alert("Ingresa valores válidos");
+      Swal.fire({
+        icon: "warning",
+        title: "Datos inválidos",
+        text: "Ingresa valores correctos de peso y altura",
+        confirmButtonColor: "#ff9800",
+        background: "#1a1a1a",
+        color: "#ffffff"
+      });
       return;
     }
 
-    const imc = (peso / (altura * altura)).toFixed(2);
-    let estado = "";
+    const alturaMetros = altura / 100;
+    const imc = (peso / (alturaMetros * alturaMetros)).toFixed(2);
 
-    if (imc < 18.5) estado = "Bajo peso";
-    else if (imc < 25) estado = "Peso normal";
-    else if (imc < 30) estado = "Sobrepeso";
-    else estado = "Obesidad";
+    let estado = "";
+    let color = "";
+
+    if (imc < 18.5) {
+      estado = "Bajo peso";
+      color = "#03a9f4";
+    } else if (imc < 25) {
+      estado = "Peso normal";
+      color = "#4caf50";
+    } else if (imc < 30) {
+      estado = "Sobrepeso";
+      color = "#ff9800";
+    } else {
+      estado = "Obesidad";
+      color = "#f44336";
+    }
 
     setResultado(`Tu IMC es ${imc} (${estado})`);
+    let consejo = "";
+    if (estado === "Bajo peso") {
+      consejo =
+        "🥗 Tu cuerpo necesita más energía y nutrientes. Te recomendamos mejorar tu alimentación, aumentar el consumo de comidas balanceadas y, si es posible, consultar con un especialista para recibir una guía adecuada.";
+    } else if (estado === "Peso normal") {
+      consejo =
+        "💪 ¡Vas por muy buen camino! Mantén una dieta equilibrada, una buena hidratación y actividad física regular para conservar tu bienestar y rendimiento.";
+    } else if (estado === "Sobrepeso") {
+      consejo =
+        "🚶‍♂️ Pequeños cambios diarios pueden marcar la diferencia. Reducir alimentos ultraprocesados, moverte más durante el día y mantener constancia te ayudará a mejorar tu salud.";
+    } else {
+      consejo =
+        "🩺 Es importante cuidar tu salud a largo plazo. Consultar con un profesional te permitirá crear un plan personalizado de alimentación y actividad física acorde a tus necesidades.";
+    }
+
+
+    setRecomendacion(consejo);
+
+
+    Swal.fire({
+      title: "Resultado de tu IMC",
+      html: `
+      <p style="font-size:18px">
+        Tu IMC es <strong>${imc}</strong>
+      </p>
+      <p style="color:${color}; font-size:20px; font-weight:bold">
+        ${estado}
+      </p>
+    `,
+      icon: "info",
+      confirmButtonColor: "#4caf50",
+      background: "#1a1a1a",
+      color: "#ffffff"
+    });
   };
+
 
   return (
     <>
@@ -153,10 +209,29 @@ function Home() {
         </form>
 
         {resultado && (
-          <p style={{ color: "#000", fontWeight: "bold" }} className="mt-3">
-            {resultado}
-          </p>
+          <>
+            <p style={{ color: "#000", fontWeight: "bold" }} className="mt-3">
+              {resultado}
+            </p>
+
+            <p
+              style={{
+                color: "#0f5132",
+                fontSize: "16px",
+                fontWeight: "500",
+                marginTop: "10px",
+                padding: "10px 14px",
+                background: "#e6f4ea",
+                borderLeft: "4px solid #198754",
+                borderRadius: "6px"
+              }}
+            >
+              {recomendacion}
+            </p>
+
+          </>
         )}
+
       </section>
 
       {/* JOIN / ESTADO SESIÓN */}

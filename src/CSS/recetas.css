@@ -1,6 +1,4 @@
-/* ============================================
-   RECETAS - PÁGINA COMPLETA
-   ============================================ */
+/*RECETAS - PÁGINA COMPLETA */
 
 .recetas-container {
   min-height: 100vh;
@@ -8,9 +6,7 @@
   padding: 100px 20px 50px;
 }
 
-/* ============================================
-   HEADER
-   ============================================ */
+/*HEADER*/
 
 .recetas-header {
   text-align: center;
@@ -35,9 +31,7 @@
   font-weight: 600;
 }
 
-/* ============================================
-   FILTROS
-   ============================================ */
+/*FILTROS*/
 
 .filtros-section {
   max-width: 800px;
@@ -77,9 +71,7 @@
   box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
 }
 
-/* ============================================
-   GRID DE RECETAS
-   ============================================ */
+/*GRID DE RECETAS*/
 
 .recetas-grid {
   display: grid;
@@ -174,10 +166,7 @@
   font-size: 0.9rem;
 }
 
-/* ============================================
-   MODAL DE RECETAS - IMAGEN OPTIMIZADA
-   Reemplaza los estilos del modal en recetas.css
-   ============================================ */
+/*MODAL DE RECETAS - IMAGEN OPTIMIZADA*/
 
 /* MODAL OVERLAY */
 .modal-overlay {
@@ -427,9 +416,7 @@
   font-size: 0.95rem;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/*RESPONSIVE*/
 
 @media (max-width: 768px) {
   .btn-close-modal-receta {

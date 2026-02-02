@@ -6,7 +6,6 @@ import { db } from "../firebase";
 function Admin() {
   const navigate = useNavigate();
 
-  // 🔒 PROTEGER RUTA ADMIN
   useEffect(() => {
     const rol = localStorage.getItem("rol");
     if (rol !== "admin") {
@@ -14,7 +13,6 @@ function Admin() {
     }
   }, [navigate]);
 
-  // 🔌 CARGAR SCRIPTS EXTERNOS
   useEffect(() => {
     const bootstrapScript = document.createElement("script");
     bootstrapScript.src =
@@ -28,7 +26,7 @@ function Admin() {
     };
   }, []);
 
-  // 🚪 BOTÓN SALIR
+  // BOTÓN SALIR
   useEffect(() => {
     const salirBtn = document.getElementById("btnSalir");
     if (salirBtn) {
@@ -39,7 +37,7 @@ function Admin() {
     }
   }, [navigate]);
 
-  // 🔥 CARGAR USUARIOS DESDE FIRESTORE
+  //CARGAR USUARIOS DESDE FIRESTORE
   useEffect(() => {
     cargarUsuarios();
   }, []);
@@ -77,7 +75,7 @@ function Admin() {
     });
   };
 
-  // ❌ ELIMINAR USUARIO
+  //ELIMINAR USUARIO
   const eliminarUsuario = async (uid) => {
     const confirmar = window.confirm(
       "¿Seguro que deseas eliminar este usuario?"

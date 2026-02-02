@@ -149,42 +149,67 @@ function Dashboard() {
     reader.readAsDataURL(file);
   };
 
-const salirDeClase = async (nombreClase, dia, hora) => {
-  const confirmar = window.confirm(
-    `¿Seguro que quieres salir de ${nombreClase}?\n${dia} ${hora}`
-  );
-  if (!confirmar) return;
-
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const claseAEliminar = clasesInscritas.find(
-    c => c.nombre === nombreClase && c.dia === dia && c.hora === hora
-  );
-
-  if (!claseAEliminar) return;
-
-  try {
-    const ref = doc(db, "usuarios", user.uid);
-
-    await updateDoc(ref, {
-      clases: arrayRemove(claseAEliminar)
+  const salirDeClase = async (nombreClase, dia, hora) => {
+    const confirmacion = await Swal.fire({
+      title: '¿Salir de la clase?',
+      text: `${nombreClase} - ${dia} ${hora}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#f44336',
+      cancelButtonColor: '#9e9e9e',
+      background: '#1a1a1a',
+      color: '#ffffff'
     });
 
-    // Actualiza el estado local
-    setClasesInscritas(prev =>
-      prev.filter(
-        c =>
-          !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
-      )
+    if (!confirmacion.isConfirmed) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const claseAEliminar = clasesInscritas.find(
+      c => c.nombre === nombreClase && c.dia === dia && c.hora === hora
     );
 
-    alert(`🚪 Saliste de ${nombreClase}`);
-  } catch (error) {
-    console.error(error);
-    alert("Error al salir de la clase");
-  }
-};
+    if (!claseAEliminar) return;
+
+    try {
+      const ref = doc(db, "usuarios", user.uid);
+
+      await updateDoc(ref, {
+        clases: arrayRemove(claseAEliminar)
+      });
+
+      setClasesInscritas(prev =>
+        prev.filter(
+          c =>
+            !(c.nombre === nombreClase && c.dia === dia && c.hora === hora)
+        )
+      );
+
+      await Swal.fire({
+        title: '¡Listo!',
+        text: `Saliste de ${nombreClase}`,
+        icon: 'success',
+        confirmButtonColor: '#4caf50',
+        background: '#1a1a1a',
+        color: '#ffffff'
+      });
+
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo salir de la clase',
+        icon: 'error',
+        confirmButtonColor: '#f44336',
+        background: '#1a1a1a',
+        color: '#ffffff'
+      });
+    }
+  };
+
 
 
   const handleEditChange = (e) => {

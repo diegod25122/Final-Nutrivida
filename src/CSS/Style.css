@@ -309,3 +309,6 @@ body {
   opacity: 0.9;
   letter-spacing: 0.3px;
 }
+.imc-section h2 {
+  color: #000000;
+}

@@ -6,7 +6,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Configuración REAL de tu proyecto
+// configuracion del proyecto
 const firebaseConfig = {
   apiKey: "AIzaSyCMN5OCjcFWoVySxjiT7X4RjZQjKjzZcm0",
   authDomain: "nutrivida-c5019.firebaseapp.com",
